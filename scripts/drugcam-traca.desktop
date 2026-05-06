@@ -1,0 +1,19 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Drugcam — Traçabilité installations
+Name[fr]=Drugcam — Traçabilité installations
+GenericName=Outil de traçabilité Drugcam
+Comment=Saisie automatisée des installations Drugcam dans Odoo
+Comment[fr]=Saisie automatisée des installations Drugcam dans Odoo
+
+# Utilise pkexec pour demander le mot de passe root via un dialog graphique
+# KDE propre, et force Qt sur XWayland pour compatibilité Wayland.
+# ⚠️ Adapter le chemin de l'AppImage ci-dessous selon ton installation.
+Exec=pkexec env QT_QPA_PLATFORM=xcb DISPLAY=%DISPLAY% XAUTHORITY=%XAUTHORITY% /opt/drugcam-traca/drugcam-traca.AppImage
+
+Icon=preferences-desktop
+Terminal=false
+Categories=Office;Utility;
+Keywords=drugcam;eurekam;tracabilite;installation;odoo;
+StartupNotify=true

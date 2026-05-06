@@ -1,0 +1,9 @@
+{
+  "_comment": "Type UC (modèle physique du PC). Les 'value' correspondent aux valeurs techniques du champ Selection x_uc_model côté Odoo.",
+  "label": "Type UC",
+  "options": [
+    { "display": "LIAN LI", "value": "lian_li" },
+    { "display": "eCW470", "value": "ecw470" },
+    { "display": "eCW475", "value": "ecw475" }
+  ]
+}

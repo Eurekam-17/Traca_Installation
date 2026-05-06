@@ -1,0 +1,10 @@
+{
+  "_comment": "Type / modèle de caméra A. Les 'value' correspondent aux valeurs techniques du champ Selection x_camera_a_model côté Odoo.",
+  "label": "Type caméra A",
+  "options": [
+    { "display": "Fire wire", "value": "fire_wire" },
+    { "display": "BU 130", "value": "bu_130" },
+    { "display": "BU 160", "value": "bu_160" },
+    { "display": "Alvium", "value": "alvium" }
+  ]
+}

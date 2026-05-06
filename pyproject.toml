@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drugcam-traca"
+version = "0.1.4"
+description = "Outil de traçabilité des installations Drugcam (Eurekam)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Eurekam", email = "loic.tamarelle@eurekam.fr" },
+]
+dependencies = [
+    "PySide6>=6.6",
+    "odoorpc>=0.10.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-mock>=3.12",
+    "black>=24.0",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+drugcam-traca = "main:main"
+drugcam-traca-collect = "system_info.cli:main"
+drugcam-traca-odoo-test = "odoo_client.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+# main.py et config.py sont des modules top-level (pas dans un package),
+# il faut les déclarer explicitement sinon setuptools ne les inclut pas dans le wheel.
+py-modules = ["main", "config"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["system_info*", "odoo_client*", "ui*", "data_options*"]
+
+[tool.setuptools.package-data]
+data_options = ["*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

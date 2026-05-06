@@ -1,0 +1,8 @@
+{
+  "_comment": "Plots inox. La valeur '_3m' commence par un underscore car Odoo n'autorise pas les valeurs de Selection démarrant par un chiffre. Le libellé affiché reste '3M'.",
+  "label": "Plots inox",
+  "options": [
+    { "display": "Lohmann", "value": "lohmann" },
+    { "display": "3M", "value": "_3m" }
+  ]
+}

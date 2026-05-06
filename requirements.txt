@@ -1,0 +1,16 @@
+# Dépendances runtime de l'outil de traçabilité Drugcam
+# Python 3.11+ requis
+
+# GUI native Qt (LGPL, cohérent KDE Plasma)
+# NB : pas de pin haut "<7.0" — python-appimage passe ces specifiers à pip
+# via /bin/sh sans quoting, et "<" est interprété comme redirection.
+# Si PySide6 7.x sort avec des breaking changes, pinner ici.
+PySide6>=6.6
+
+# Client Odoo XML-RPC / JSON-RPC (OCA)
+# ⚠️ À remplacer par une implémentation External JSON-2 API à partir de 2027
+# (cf. CLAUDE.md § 2bis-C)
+odoorpc>=0.10.1
+
+# Aucune autre dépendance externe : on utilise la stdlib pour
+# logging, json, regex, subprocess, glob, etc.

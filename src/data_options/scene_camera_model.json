@@ -1,0 +1,8 @@
+{
+  "_comment": "Type de caméra de scène. Les 'value' correspondent aux valeurs techniques du champ Selection x_scene_camera_model côté Odoo.",
+  "label": "Type caméra de scène",
+  "options": [
+    { "display": "Microsoft", "value": "microsoft" },
+    { "display": "ELP", "value": "elp" }
+  ]
+}

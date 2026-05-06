@@ -1,0 +1,15 @@
+{
+  "_comment": "Type d'enceinte / hotte dans laquelle le poste Drugcam est installé. Les 'value' DOIVENT correspondre aux valeurs techniques du champ Selection x_workstation_type côté Odoo.",
+  "label": "Type d'enceinte / hotte",
+  "options": [
+    { "display": "Iso JCE", "value": "iso_jce" },
+    { "display": "Iso Sieve", "value": "iso_sieve" },
+    { "display": "Iso Eurobio", "value": "iso_eurobio" },
+    { "display": "Iso Getinge", "value": "iso_getinge" },
+    { "display": "Hotte Faster", "value": "hotte_faster" },
+    { "display": "Hotte Thermofisher", "value": "hotte_thermofisher" },
+    { "display": "Hotte ADS", "value": "hotte_ads" },
+    { "display": "Hotte Berner", "value": "hotte_berner" },
+    { "display": "Autres", "value": "autres" }
+  ]
+}

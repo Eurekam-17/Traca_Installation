@@ -1,0 +1,10 @@
+{
+  "_comment": "Type de souris. Les 'value' correspondent aux valeurs techniques du champ Selection x_mouse_model côté Odoo.",
+  "label": "Type de souris",
+  "options": [
+    { "display": "Sealshield", "value": "sealshield" },
+    { "display": "Silicone", "value": "silicone" },
+    { "display": "Tactile", "value": "tactile" },
+    { "display": "Induction", "value": "induction" }
+  ]
+}

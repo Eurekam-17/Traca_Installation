@@ -1,0 +1,11 @@
+{
+  "_comment": "Type de câble caméra B. Les 'value' correspondent aux valeurs techniques du champ Selection x_camera_b_cable côté Odoo.",
+  "label": "Type câble caméra B",
+  "options": [
+    { "display": "FIRE WIRE", "value": "fire_wire" },
+    { "display": "ALYSIUM", "value": "alysium" },
+    { "display": "ALYSIUM V2", "value": "alysium_v2" },
+    { "display": "ALYSIUM BLINDÉ POUR TELI", "value": "alysium_blinde_teli" },
+    { "display": "ALYSIUM BLINDÉ POUR ALVIUM", "value": "alysium_blinde_alvium" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "Bloc d'alimentation. Les 'value' correspondent aux valeurs techniques du champ Selection x_power_supply_type côté Odoo.",
+  "label": "Bloc d'alimentation",
+  "options": [
+    { "display": "C5 120W", "value": "c5_120w" },
+    { "display": "FSP 120W", "value": "fsp_120w" },
+    { "display": "MEANWELL 80W", "value": "meanwell_80w" },
+    { "display": "CWT 120W", "value": "cwt_120w" },
+    { "display": "MEAN WELL 120W", "value": "mean_well_120w" }
+  ]
+}

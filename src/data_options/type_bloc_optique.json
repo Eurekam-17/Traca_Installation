@@ -1,0 +1,9 @@
+{
+  "_comment": "Type de bloc optique. Les 'value' correspondent aux valeurs techniques du champ Selection x_optical_block_type côté Odoo.",
+  "label": "Type de bloc optique",
+  "options": [
+    { "display": "Sortie droite", "value": "sortie_droite" },
+    { "display": "Sortie latérale", "value": "sortie_laterale" },
+    { "display": "Democom", "value": "democom" }
+  ]
+}

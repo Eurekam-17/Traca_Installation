@@ -1,0 +1,161 @@
+"""Implémentation factice de OdooClientBase pour DRY_RUN et tests pytest.
+
+Activable au choix par :
+- la variable d'environnement ``DRUGCAM_TRACA_DRY_RUN=1``
+- l'instanciation directe dans les tests pytest
+
+Aucun appel réseau, aucun import odoorpc — totalement autonome.
+Logge ce qui aurait été inséré et garde l'historique en mémoire pour
+inspection ultérieure (utile dans les tests).
+"""
+
+from __future__ import annotations
+
+import itertools
+import logging
+from dataclasses import asdict
+from typing import Any
+
+from . import numbering
+from .base import (
+    Customer,
+    OdooClientBase,
+    OdooDuplicateError,
+    PosteData,
+    TracabiliteData,
+)
+
+logger = logging.getLogger(__name__)
+
+
+# Liste de clients factices — couvre les deux étiquettes mentionnées au § 5.
+DEFAULT_FAKE_CUSTOMERS = [
+    Customer(odoo_id=101, name="CHU de Lille — Pharmacie centrale"),
+    Customer(odoo_id=102, name="Hôpital Européen Georges-Pompidou"),
+    Customer(odoo_id=103, name="Institut Gustave Roussy"),
+    Customer(odoo_id=104, name="CHRU de Brest — UPCO"),
+    Customer(odoo_id=105, name="Centre Léon Bérard (Lyon)"),
+]
+
+
+class MockOdooClient(OdooClientBase):
+    """Implémentation en mémoire qui simule Odoo sans appel réseau."""
+
+    def __init__(
+        self,
+        customers: list[Customer] | None = None,
+        existing_postes: list[dict[str, Any]] | None = None,
+        existing_tracabilite_serials: list[str] | None = None,
+        existing_optical_block_serials: list[str] | None = None,
+    ) -> None:
+        self._customers = list(customers) if customers is not None else list(DEFAULT_FAKE_CUSTOMERS)
+        self._existing_postes = list(existing_postes) if existing_postes else []
+        self._existing_tracabilite_serials = (
+            list(existing_tracabilite_serials)
+            if existing_tracabilite_serials else ["AB000001", "AB000002", "AB000041"]
+        )
+        self._existing_optical_block_serials = (
+            list(existing_optical_block_serials)
+            if existing_optical_block_serials else ["010001", "010003", "010012"]
+        )
+        # Historique des créations effectuées en mode mock — accessible aux tests
+        self.created_postes: list[PosteData] = []
+        self.created_tracabilite: list[TracabiliteData] = []
+        self._authenticated = False
+        self._id_generator = itertools.count(start=1000)
+
+    def authenticate(self) -> None:
+        logger.info("[MOCK] authenticate() — aucun appel réseau, OK.")
+        self._authenticated = True
+
+    def list_active_customers(self) -> list[Customer]:
+        self._require_auth()
+        return list(self._customers)
+
+    def find_poste_by_serial(self, pc_serial: str) -> dict | None:
+        self._require_auth()
+        if not pc_serial:
+            return None
+        for poste in self._existing_postes:
+            if pc_serial == poste.get("pc_serial"):
+                return {
+                    "id": poste["id"],
+                    "name": poste.get("name", "?"),
+                    "customer_name": poste.get("customer_name", "?"),
+                    "previous_serial": poste.get("previous_serial", "?"),
+                    "previous_date": poste.get("previous_date", "?"),
+                }
+        return None
+
+    def next_tracability_serial(self) -> str:
+        self._require_auth()
+        return numbering.next_tracability_serial(self._existing_tracabilite_serials)
+
+    def next_optical_block_serial(self) -> str:
+        self._require_auth()
+        return numbering.next_optical_block_serial(self._existing_optical_block_serials)
+
+    def create_poste_client(self, data: PosteData) -> int:
+        """Mock du lookup-or-create : retourne toujours un nouvel ID, et stocke
+        le payload pour inspection dans les tests."""
+        self._require_auth()
+        new_id = next(self._id_generator)
+        self.created_postes.append(data)
+        logger.info("[MOCK] LOOKUP-OR-CREATE Postes clients (id=%d) :\n%s",
+                    new_id, _pretty(asdict(data)))
+        return new_id
+
+    def create_tracability_record(self, data: TracabiliteData) -> int:
+        self._require_auth()
+        new_id = next(self._id_generator)
+        self.created_tracabilite.append(data)
+        # On simule la prise en compte du nouveau S/N pour les prochains appels
+        self._existing_tracabilite_serials.append(data.serial_number)
+        self._existing_optical_block_serials.append(data.optical_block_serial)
+        logger.info("[MOCK] CREATE Traçabilité (id=%d) :\n%s", new_id, _pretty(asdict(data)))
+        return new_id
+
+    def delete_poste_client(self, poste_id: int) -> bool:
+        """En mode mock : retire le poste de l'historique des créations."""
+        self._require_auth()
+        before = len(self.created_postes)
+        # Filtre par index : les créations sont stockées dans l'ordre d'insertion,
+        # mais on ne stocke pas l'ID retourné. Pour le mock on accepte que tout
+        # ID demandé soit "supprimable" et on log l'opération.
+        logger.info("[MOCK] UNLINK Postes clients (id=%d).", poste_id)
+        return True
+
+    # ------------------------------------------------------------------ #
+    # Helpers
+    # ------------------------------------------------------------------ #
+    def _require_auth(self) -> None:
+        if not self._authenticated:
+            raise RuntimeError(
+                "MockOdooClient : authenticate() doit être appelé d'abord."
+            )
+
+    def add_existing_poste(
+        self,
+        poste_id: int,
+        name: str,
+        customer_name: str,
+        pc_serial: str,
+        previous_serial: str = "AB000099",
+        previous_date: str = "2025-01-01",
+    ) -> None:
+        """Aide pour les tests : injecte un poste pré-existant pour tester
+        la détection de doublon. ``pc_serial`` correspond à un installation_log
+        existant lié à ce poste (recherche dans find_poste_by_serial)."""
+        self._existing_postes.append({
+            "id": poste_id,
+            "name": name,
+            "customer_name": customer_name,
+            "pc_serial": pc_serial,
+            "previous_serial": previous_serial,
+            "previous_date": previous_date,
+        })
+
+
+def _pretty(data: dict[str, Any]) -> str:
+    """Formattage lisible pour le log d'un dict."""
+    return "\n".join(f"    {k:30s} = {v!r}" for k, v in data.items())
