@@ -1,15 +1,14 @@
 """Étape 3 — Récapitulatif et envoi vers Odoo.
 
-Cf. CLAUDE.md § 5 étape 5 :
 - Récap de tous les champs.
 - Boutons "Modifier" (retour étape 2) et "Confirmer l'envoi".
-- Insertion dans les 2 tables Odoo dans une transaction (rollback si échec).
+- UPSERT sur customer.asset.workstation (création si nouveau poste,
+  mise à jour sinon).
 - Écran de succès avec rappel des numéros + bouton "Nouvelle installation" / "Quitter".
 
-Note transaction : odoorpc ne propose pas de transaction explicite côté
-client — on simule un rollback en supprimant la fiche Postes clients si
-la création de Traçabilité échoue. Pour une vraie transaction atomique, il
-faudrait un endpoint custom côté Odoo.
+Architecture v0.2.0 : un seul appel API (UPSERT). Plus de modèle Traçabilité
+séparé, plus de rollback transactionnel à gérer. L'historique des
+modifications est conservé par le chatter natif Odoo.
 """
 
 from __future__ import annotations
@@ -38,58 +37,33 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Worker d'envoi (transaction simulée : rollback si la 2e création échoue)
+# Worker d'envoi (UPSERT en un seul appel API)
 # ---------------------------------------------------------------------------
 class _SubmitWorker(QThread):
-    finished_ok = Signal(int, int, str, str)   # poste_id, traca_id, serial_eq, serial_block
+    finished_ok = Signal(int, str, str)   # workstation_id, serial_eq, serial_block
     failed = Signal(str)
 
     def __init__(
         self,
         client: OdooClientBase,
-        draft: InstallationDraft,
         poste_data: PosteData,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self._client = client
-        self._draft = draft
         self._poste_data = poste_data
 
     def run(self) -> None:
-        # Étape 1 : lookup-or-create workstation (customer.asset.workstation).
         try:
             workstation_id = self._client.create_poste_client(self._poste_data)
         except OdooError as exc:
-            self.failed.emit(f"Création/lookup de la fiche poste en échec :\n{exc}")
-            return
-
-        # Étape 2 : on construit le payload Traçabilité avec l'ID de workstation.
-        try:
-            traca_data = self._draft.to_tracabilite_data(workstation_id)
-        except ValueError as exc:
-            self.failed.emit(f"Données d'installation incomplètes :\n{exc}")
-            return
-
-        # Étape 3 : création du log d'installation.
-        # Pas de rollback automatique de la workstation : avec le lookup-or-create,
-        # on ne sait pas distinguer "créée à l'instant" vs "déjà existante" — donc
-        # on évite de supprimer pour ne pas perdre une fiche pré-existante.
-        try:
-            traca_id = self._client.create_tracability_record(traca_data)
-        except OdooError as exc:
-            self.failed.emit(
-                f"Création de l'historique d'installation en échec :\n{exc}\n\n"
-                f"⚠️ La fiche poste (id={workstation_id}) reste présente côté Odoo "
-                "(elle existait peut-être déjà). Vérifier manuellement et retenter."
-            )
+            self.failed.emit(f"UPSERT customer.asset.workstation en échec :\n{exc}")
             return
 
         self.finished_ok.emit(
             workstation_id,
-            traca_id,
-            traca_data.serial_number,
-            traca_data.optical_block_serial,
+            self._poste_data.workstation_serial_number,
+            self._poste_data.optical_block_serial,
         )
 
 
@@ -252,7 +226,7 @@ class SummaryStep(BaseStep):
         self._nav.set_next_enabled(False)
         self._nav.set_back_enabled(False)
 
-        self._worker = _SubmitWorker(self._client, self._draft, poste_data, self)
+        self._worker = _SubmitWorker(self._client, poste_data, self)
         self._worker.finished_ok.connect(self._on_submit_done)
         self._worker.failed.connect(self._on_submit_failed)
         self._worker.start()
@@ -266,14 +240,13 @@ class SummaryStep(BaseStep):
 
     def _on_submit_done(
         self,
-        poste_id: int,
-        traca_id: int,
+        workstation_id: int,
         serial_eq: str,
         serial_block: str,
     ) -> None:
         logger.info(
-            "Envoi Odoo OK : poste_id=%d, traca_id=%d, eq=%s, block=%s",
-            poste_id, traca_id, serial_eq, serial_block,
+            "Envoi Odoo OK : workstation_id=%d, eq=%s, block=%s",
+            workstation_id, serial_eq, serial_block,
         )
         self._render_success(serial_eq, serial_block)
         self._stack.setCurrentIndex(2)

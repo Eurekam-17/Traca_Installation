@@ -12,6 +12,59 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.2.0] — 2026-05-06
+
+> **Changement architectural majeur** suite à l'écrasement de la base
+> staging et au repivot vers le module Scalizer existant.
+
+### Changé (côté Odoo)
+- **Bascule sur la nouvelle instance** `eurekam-recette.odoo.com` (l'ancienne
+  staging `eurekam-staging-28517368` ayant été remplacée par une copie
+  fraîche de la prod).
+- **Abandon du modèle `x_customer_asset_installation_log`** (ancien
+  modèle dédié à l'historique d'installations qui avait été créé en v0.1.3).
+- Les **22 champs métier** sont désormais ajoutés directement sur le
+  modèle `customer.asset.workstation` (module Scalizer
+  `s6r_eurekam_customer_assets`) en mode `state='manual'`. Plus de modèle
+  séparé : 1 fiche workstation = 1 jeu de valeurs (état actuel du poste).
+- 3 nouvelles vues d'héritage côté Odoo :
+  - vue **form** `customer.asset.workstation` enrichie avec 7 sections
+    (Identification / UC / Bloc optique / Caméras A & B / Caméra de scène /
+    Accessoires / Commentaires)
+  - vue **list standalone** : 22 colonnes optionnelles
+  - **list inline** dans l'onglet "SAV & Informations Techniques" de
+    `res.partner` : les 22 colonnes apparaissent dans le sélecteur ⚙️
+    du tableau "Postes Assist"
+
+### Changé (côté code Python)
+- **`PosteData`** enrichie de 22 attributs (avec defaults `""` pour
+  rester rétro-compatible). Plus de `TracabiliteData` (supprimé).
+- **`OdooClientBase.create_poste_client`** devient un **UPSERT** :
+  recherche par `(partner_id, name=hostname)`, mise à jour si trouvé,
+  création sinon. Retourne toujours l'ID workstation.
+- **`find_poste_by_serial`** : recherche directe sur
+  `customer.asset.workstation.x_pc_serial_number` (au lieu de l'ancien
+  modèle log).
+- **`next_*_serial`** : lecture sur `customer.asset.workstation`
+  (champs `x_workstation_serial_number` et `x_optical_block_serial`).
+- **Worker step3** : 1 seul appel API au lieu de 2. Plus de rollback
+  transactionnel (l'UPSERT gère naturellement le re-run).
+- **`InstallationDraft.to_poste_data()`** unique méthode de conversion
+  (suppression de `to_tracabilite_data`).
+- 38 tests pytest passent (au lieu de 36 : ajout d'un test de payload
+  minimal).
+
+### Trade-offs assumés (option A "tout sur workstation")
+- ✅ **Plus simple** : 1 modèle, 1 appel API, pas de rollback, pas de
+  Many2one inverse.
+- ❌ **Pas d'historique structuré** : si tu remplaces une caméra ou
+  changes un câble dans 6 mois, les anciennes valeurs sont écrasées.
+  Mitigation : le **chatter Odoo natif** logge automatiquement les
+  modifications (qui, quand, ancien/nouveau). Pas exploitable comme
+  un tableau, mais consultable poste par poste.
+
+---
+
 ## [0.1.4] — 2026-05-06
 
 ### Ajouté
@@ -220,6 +273,7 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+[0.2.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.0
 [0.1.4]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.4
 [0.1.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.3
 [0.1.2]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.2

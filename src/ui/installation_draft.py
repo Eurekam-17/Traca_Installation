@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from odoo_client.base import Customer, PosteData, TracabiliteData
+from odoo_client.base import Customer, PosteData
 from system_info import SystemInfo
 
 
@@ -148,25 +148,11 @@ class InstallationDraft:
         return missing
 
     def to_poste_data(self) -> PosteData:
-        """Construit le payload pour la table Postes clients (§ 8)."""
-        if self.customer is None:
-            raise ValueError("Aucun client sélectionné.")
-        return PosteData(
-            customer_id=self.customer.odoo_id,
-            description=self.get("hostname"),
-            os_version=self.get("os_pretty_name"),
-            assist_version=self.get("assist_version"),
-            mac_addresses=self.get("mac_addresses"),
-        )
+        """Construit le payload complet pour customer.asset.workstation.
 
-    def to_tracabilite_data(self, workstation_id: int) -> TracabiliteData:
-        """Construit le payload pour la table Traçabilité.
-
-        Args:
-            workstation_id: ID Odoo de la fiche customer.asset.workstation
-                à laquelle ce log d'installation sera lié. Cet ID est obtenu
-                via :meth:`OdooClientBase.create_poste_client` qui fait du
-                lookup-or-create.
+        En v0.2.0, c'est l'unique conversion : tous les champs métier
+        (matériel, accessoires, snapshot système, commentaires) sont stockés
+        sur la fiche workstation directement. Pas de modèle Traçabilité séparé.
         """
         if self.customer is None:
             raise ValueError("Aucun client sélectionné.")
@@ -174,28 +160,25 @@ class InstallationDraft:
             "installation_date",
             self.system_info.installation_date if self.system_info else "",
         )
-        # Si le technicien n'a pas saisi un nom de poste libre,
-        # on retombe sur le hostname auto-détecté.
-        workstation_name = self.workstation_name or self.get("hostname")
-        # Idem pour le type caméra : sur les champs auto, le modèle est dans
-        # camera_a_model (collecte sysfs). Mais le type est désormais une
-        # Selection saisie manuellement par le technicien.
-        return TracabiliteData(
-            # Identification
-            serial_number=self.serial_number,
-            workstation_id=workstation_id,
-            optical_block_serial=self.optical_block_serial,
-            workstation_name=workstation_name,
+        return PosteData(
+            # Champs natifs Scalizer
+            customer_id=self.customer.odoo_id,
+            description=self.get("hostname"),
+            os_version=self.get("os_pretty_name"),
+            assist_version=self.get("assist_version"),
+            mac_addresses=self.get("mac_addresses"),
+            # Identification matérielle
+            workstation_serial_number=self.serial_number,
             workstation_type=self.workstation_type,
-            workstation_serial_number=self.workstation_serial_number,
             installation_date=installation_date,
             # UC
             uc_model=self.modele_uc,
             pc_serial_number=self.get("pc_serial_number"),
             cpu_version=self.get("cpu_version"),
             # Bloc optique
-            type_bloc_optique=self.type_bloc_optique,
-            # Caméra A
+            optical_block_serial=self.optical_block_serial,
+            optical_block_type=self.type_bloc_optique,
+            # Caméra A : modèle = Selection saisie ; S/N = collecte sysfs
             camera_a_model=self.type_camera_a,
             camera_a_serial=self.camera_a_serial,
             camera_a_objective=self.objectif_a,
@@ -212,10 +195,6 @@ class InstallationDraft:
             souris=self.souris,
             bloc_alim=self.type_bloc_alim,
             plots_inox=self.type_plot_inox,
-            # Snapshots système
-            assist_version=self.get("assist_version"),
-            mac_addresses=self.get("mac_addresses"),
-            os_version=self.get("os_pretty_name"),
-            # Commentaires libres
+            # Texte libre
             comments=self.comments,
         )

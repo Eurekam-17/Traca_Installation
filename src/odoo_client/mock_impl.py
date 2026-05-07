@@ -20,9 +20,7 @@ from . import numbering
 from .base import (
     Customer,
     OdooClientBase,
-    OdooDuplicateError,
     PosteData,
-    TracabiliteData,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,22 +43,22 @@ class MockOdooClient(OdooClientBase):
         self,
         customers: list[Customer] | None = None,
         existing_postes: list[dict[str, Any]] | None = None,
-        existing_tracabilite_serials: list[str] | None = None,
+        existing_workstation_serials: list[str] | None = None,
         existing_optical_block_serials: list[str] | None = None,
     ) -> None:
         self._customers = list(customers) if customers is not None else list(DEFAULT_FAKE_CUSTOMERS)
         self._existing_postes = list(existing_postes) if existing_postes else []
-        self._existing_tracabilite_serials = (
-            list(existing_tracabilite_serials)
-            if existing_tracabilite_serials else ["AB000001", "AB000002", "AB000041"]
+        self._existing_workstation_serials = (
+            list(existing_workstation_serials)
+            if existing_workstation_serials else ["AB000001", "AB000002", "AB000041"]
         )
         self._existing_optical_block_serials = (
             list(existing_optical_block_serials)
             if existing_optical_block_serials else ["010001", "010003", "010012"]
         )
-        # Historique des créations effectuées en mode mock — accessible aux tests
-        self.created_postes: list[PosteData] = []
-        self.created_tracabilite: list[TracabiliteData] = []
+        # Historique des UPSERT effectués en mode mock — accessible aux tests.
+        # Chaque entrée est une PosteData.
+        self.upserted_postes: list[PosteData] = []
         self._authenticated = False
         self._id_generator = itertools.count(start=1000)
 
@@ -89,41 +87,30 @@ class MockOdooClient(OdooClientBase):
 
     def next_tracability_serial(self) -> str:
         self._require_auth()
-        return numbering.next_tracability_serial(self._existing_tracabilite_serials)
+        return numbering.next_tracability_serial(self._existing_workstation_serials)
 
     def next_optical_block_serial(self) -> str:
         self._require_auth()
         return numbering.next_optical_block_serial(self._existing_optical_block_serials)
 
     def create_poste_client(self, data: PosteData) -> int:
-        """Mock du lookup-or-create : retourne toujours un nouvel ID, et stocke
-        le payload pour inspection dans les tests."""
+        """Mock UPSERT : on stocke le payload pour inspection dans les tests
+        et on retourne un nouvel ID à chaque appel (le mock ne distingue pas
+        encore create vs update — peu utile pour les tests unitaires)."""
         self._require_auth()
         new_id = next(self._id_generator)
-        self.created_postes.append(data)
-        logger.info("[MOCK] LOOKUP-OR-CREATE Postes clients (id=%d) :\n%s",
-                    new_id, _pretty(asdict(data)))
+        self.upserted_postes.append(data)
+        # Met à jour les pools de S/N pour que les next_*_serial reflètent
+        # le nouvel enregistrement (utile dans les tests d'intégration).
+        if data.workstation_serial_number:
+            self._existing_workstation_serials.append(data.workstation_serial_number)
+        if data.optical_block_serial:
+            self._existing_optical_block_serials.append(data.optical_block_serial)
+        logger.info(
+            "[MOCK] UPSERT customer.asset.workstation (id=%d) :\n%s",
+            new_id, _pretty(asdict(data)),
+        )
         return new_id
-
-    def create_tracability_record(self, data: TracabiliteData) -> int:
-        self._require_auth()
-        new_id = next(self._id_generator)
-        self.created_tracabilite.append(data)
-        # On simule la prise en compte du nouveau S/N pour les prochains appels
-        self._existing_tracabilite_serials.append(data.serial_number)
-        self._existing_optical_block_serials.append(data.optical_block_serial)
-        logger.info("[MOCK] CREATE Traçabilité (id=%d) :\n%s", new_id, _pretty(asdict(data)))
-        return new_id
-
-    def delete_poste_client(self, poste_id: int) -> bool:
-        """En mode mock : retire le poste de l'historique des créations."""
-        self._require_auth()
-        before = len(self.created_postes)
-        # Filtre par index : les créations sont stockées dans l'ordre d'insertion,
-        # mais on ne stocke pas l'ID retourné. Pour le mock on accepte que tout
-        # ID demandé soit "supprimable" et on log l'opération.
-        logger.info("[MOCK] UNLINK Postes clients (id=%d).", poste_id)
-        return True
 
     # ------------------------------------------------------------------ #
     # Helpers
@@ -144,8 +131,8 @@ class MockOdooClient(OdooClientBase):
         previous_date: str = "2025-01-01",
     ) -> None:
         """Aide pour les tests : injecte un poste pré-existant pour tester
-        la détection de doublon. ``pc_serial`` correspond à un installation_log
-        existant lié à ce poste (recherche dans find_poste_by_serial)."""
+        la détection de doublon. ``pc_serial`` correspond à un poste existant
+        avec ce S/N PC."""
         self._existing_postes.append({
             "id": poste_id,
             "name": name,

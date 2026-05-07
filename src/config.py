@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 # Pour ajouter un profil (ex : pré-prod), ajouter une entrée à PROFILES.
 PROFILES: dict[str, dict[str, str | int]] = {
     "staging": {
-        "label": "Staging (eurekam-staging-28517368)",
-        "host": "eurekam-staging-28517368.dev.odoo.com",
-        "db": "eurekam-staging-28517368",
+        "label": "Recette (eurekam-recette)",
+        "host": "eurekam-recette.odoo.com",
+        "db": "eurekam-recette",
         "login": "traca-bot@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,
@@ -114,15 +114,15 @@ CUSTOMER_CATEGORY_PROD = "EN PROD"
 # ---------------------------------------------------------------------------
 # Modèles Odoo cibles
 # ---------------------------------------------------------------------------
-# customer.asset.workstation : modèle existant chez Eurekam, contient les fiches
-# postes Drugcam (383 enregistrements en staging au moment de la mise en place).
-# x_customer_asset_installation_log : modèle créé spécifiquement pour ce projet
-# (cf. notes d'implémentation Odoo Studio).
+# customer.asset.workstation : modèle du module Scalizer s6r_eurekam_customer_assets
+# qui stocke les fiches postes Drugcam (~390 enregistrements en recette).
+# Depuis la v0.2.0, tous les champs métier (type d'enceinte, UC, caméras,
+# accessoires, commentaires) sont stockés directement sur ce modèle via les
+# champs x_* créés en mode 'manual' (résistants aux mises à jour Scalizer).
+# Pas de modèle Traçabilité séparé — l'historique d'installations est
+# remplacé par l'audit log natif Odoo (chatter).
 ODOO_MODEL_POSTE = os.environ.get(
     "DRUGCAM_TRACA_MODEL_POSTE", "customer.asset.workstation"
-)
-ODOO_MODEL_TRACABILITE = os.environ.get(
-    "DRUGCAM_TRACA_MODEL_TRACABILITE", "x_customer_asset_installation_log"
 )
 ODOO_MODEL_PARTNER = "res.partner"
 ODOO_MODEL_PARTNER_CATEGORY = "res.partner.category"

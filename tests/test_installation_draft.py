@@ -66,37 +66,44 @@ class TestValidation:
 
 
 class TestPayloadConversion:
-    def test_to_poste_data(self) -> None:
-        draft = _filled_draft()
-        poste = draft.to_poste_data()
+    """En v0.2.0, to_poste_data() construit un PosteData enrichi qui contient
+    TOUT (matériel + accessoires + snapshot). Plus de TracabiliteData séparé."""
+
+    def test_to_poste_data_contains_native_scalizer_fields(self) -> None:
+        poste = _filled_draft().to_poste_data()
         assert poste.customer_id == 101
         assert poste.description == "assist1"
         assert poste.os_version == "Rocky Linux 9.3 (Blue Onyx)"
         assert poste.assist_version == "2.5.11"
         assert poste.mac_addresses == "aa:bb:cc:dd:ee:ff"
 
-    def test_to_tracabilite_data(self) -> None:
-        draft = _filled_draft()
-        traca = draft.to_tracabilite_data(workstation_id=4242)
-        assert traca.serial_number == "AB000042"
-        assert traca.workstation_id == 4242
-        assert traca.optical_block_serial == "010013"
-        # Modèle UC et S/N PC sont 2 champs séparés (cf. modèle Odoo).
-        assert traca.uc_model == "lian_li"
-        assert traca.pc_serial_number == "ABC1234"
-        # Caméra A : S/N depuis SystemInfo, type depuis le draft (Selection)
-        assert traca.camera_a_model == "alvium"
-        assert traca.camera_a_serial == "00050"  # plus petit S/N
-        assert traca.camera_a_cable == "alysium"
-        assert traca.camera_b_serial == "00100"
-        # Snapshots
-        assert traca.os_version == "Rocky Linux 9.3 (Blue Onyx)"
-        # Workstation type et accessoires
-        assert traca.workstation_type == "iso_jce"
-        assert traca.souris == "sealshield"
-        assert traca.plots_inox == "lohmann"
-        # Nom du poste : retombe sur hostname si vide
-        assert traca.workstation_name == "assist1"
+    def test_to_poste_data_contains_identification_fields(self) -> None:
+        poste = _filled_draft().to_poste_data()
+        assert poste.workstation_serial_number == "AB000042"
+        assert poste.workstation_type == "iso_jce"
+
+    def test_to_poste_data_contains_uc_and_optical_block(self) -> None:
+        poste = _filled_draft().to_poste_data()
+        assert poste.uc_model == "lian_li"
+        assert poste.pc_serial_number == "ABC1234"
+        assert poste.cpu_version.startswith("Intel(R) Core(TM)")
+        assert poste.optical_block_serial == "010013"
+        assert poste.optical_block_type == "sortie_droite"
+
+    def test_to_poste_data_contains_cameras(self) -> None:
+        poste = _filled_draft().to_poste_data()
+        # Caméra A : type = Selection saisie, S/N = collecte sysfs (plus petit)
+        assert poste.camera_a_model == "alvium"
+        assert poste.camera_a_serial == "00050"
+        assert poste.camera_a_objective == "f8"
+        assert poste.camera_a_cable == "alysium"
+        assert poste.camera_b_serial == "00100"
+
+    def test_to_poste_data_contains_accessories(self) -> None:
+        poste = _filled_draft().to_poste_data()
+        assert poste.souris == "sealshield"
+        assert poste.bloc_alim == "c5_120w"
+        assert poste.plots_inox == "lohmann"
 
     def test_overrides_take_precedence(self) -> None:
         draft = _filled_draft()

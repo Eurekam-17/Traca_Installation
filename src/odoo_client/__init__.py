@@ -7,12 +7,11 @@ fin 2027 sur Odoo Online).
 Aucun autre module de l'application ne doit importer odoorpc directement.
 """
 
-from .base import OdooClientBase, OdooConnectionError, OdooDuplicateError, PosteData, TracabiliteData
+from .base import OdooClientBase, OdooConnectionError, OdooDuplicateError, PosteData
 
 __all__ = [
     "OdooClientBase",
     "OdooConnectionError",
     "OdooDuplicateError",
     "PosteData",
-    "TracabiliteData",
 ]
