@@ -6,6 +6,7 @@ chez un client, et envoie les données dans Odoo.
 
 > Spécifications complètes dans [`CLAUDE.md`](CLAUDE.md).
 > Historique des versions dans [`CHANGELOG.md`](CHANGELOG.md).
+> Import en masse via Excel/CSV : voir [`docs/odoo_import/`](docs/odoo_import/).
 > Cible : **Rocky Linux 9 + KDE Plasma**, livraison **AppImage**.
 
 ---

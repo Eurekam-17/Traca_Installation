@@ -12,6 +12,33 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.2.2] — 2026-05-11
+
+### Ajouté
+- **Tracking Odoo** activé sur les 22 champs custom de
+  `customer.asset.workstation` (`tracking=100`, comme les champs natifs
+  Scalizer). Toute modification est désormais loguée automatiquement
+  dans le **chatter** de la fiche poste, avec auteur, date, ancienne et
+  nouvelle valeur — exactement comme on voit déjà pour
+  `software_fedora_version`, `software_assist_version_id`, etc.
+  Pour les Selections, le chatter affiche les **libellés** humains
+  (`Iso JCE`, `LIAN LI`) et non les valeurs techniques.
+- **Templates d'import Excel/CSV** dans [`docs/odoo_import/`](docs/odoo_import/) :
+  - `template_postes_assist.csv` : 35 colonnes (natifs Scalizer + 22
+    Drugcam) + 1 ligne d'exemple, prêt à dupliquer dans Excel
+  - `valeurs_selections.csv` : référence des valeurs techniques acceptées
+    pour les 13 champs Selection (utile pour valider les saisies)
+  - `guide_import.md` : procédure complète d'import via le bouton
+    "Importer des enregistrements" du module Parc Client, règles
+    métier, pièges fréquents
+- Référence vers `docs/odoo_import/` dans le `README.md`.
+
+### Changé
+- Aucun changement de code Python (toujours `0.2.1` côté logique métier ;
+  patch 0.2.2 ajoute uniquement de la documentation et de l'admin Odoo).
+
+---
+
 ## [0.2.1] — 2026-05-06
 
 ### Ajouté
@@ -291,6 +318,7 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+[0.2.2]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.2
 [0.2.1]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.0
 [0.1.4]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.4

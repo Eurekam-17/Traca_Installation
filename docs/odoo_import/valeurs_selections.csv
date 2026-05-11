@@ -1,0 +1,51 @@
+champ,valeur_technique,libelle_affiche
+x_workstation_type,iso_jce,Iso JCE
+x_workstation_type,iso_sieve,Iso Sieve
+x_workstation_type,iso_eurobio,Iso Eurobio
+x_workstation_type,iso_getinge,Iso Getinge
+x_workstation_type,hotte_faster,Hotte Faster
+x_workstation_type,hotte_thermofisher,Hotte Thermofisher
+x_workstation_type,hotte_ads,Hotte ADS
+x_workstation_type,hotte_berner,Hotte Berner
+x_workstation_type,autres,Autres
+x_uc_model,lian_li,LIAN LI
+x_uc_model,ecw470,eCW470
+x_uc_model,ecw475,eCW475
+x_optical_block_type,sortie_droite,Sortie droite
+x_optical_block_type,sortie_laterale,Sortie latérale
+x_optical_block_type,democom,Democom
+x_camera_a_model,fire_wire,Fire wire
+x_camera_a_model,bu_130,BU 130
+x_camera_a_model,bu_160,BU 160
+x_camera_a_model,alvium,Alvium
+x_camera_b_model,fire_wire,Fire wire
+x_camera_b_model,bu_130,BU 130
+x_camera_b_model,bu_160,BU 160
+x_camera_b_model,alvium,Alvium
+x_camera_a_objective,f8,F8
+x_camera_a_objective,f12,F12
+x_camera_b_objective,f8,F8
+x_camera_b_objective,f12,F12
+x_camera_a_cable,fire_wire,FIRE WIRE
+x_camera_a_cable,alysium,ALYSIUM
+x_camera_a_cable,alysium_v2,ALYSIUM V2
+x_camera_a_cable,alysium_blinde_teli,ALYSIUM BLINDÉ POUR TELI
+x_camera_a_cable,alysium_blinde_alvium,ALYSIUM BLINDÉ POUR ALVIUM
+x_camera_b_cable,fire_wire,FIRE WIRE
+x_camera_b_cable,alysium,ALYSIUM
+x_camera_b_cable,alysium_v2,ALYSIUM V2
+x_camera_b_cable,alysium_blinde_teli,ALYSIUM BLINDÉ POUR TELI
+x_camera_b_cable,alysium_blinde_alvium,ALYSIUM BLINDÉ POUR ALVIUM
+x_scene_camera_model,microsoft,Microsoft
+x_scene_camera_model,elp,ELP
+x_mouse_model,sealshield,Sealshield
+x_mouse_model,silicone,Silicone
+x_mouse_model,tactile,Tactile
+x_mouse_model,induction,Induction
+x_power_supply_type,c5_120w,C5 120W
+x_power_supply_type,fsp_120w,FSP 120W
+x_power_supply_type,meanwell_80w,MEANWELL 80W
+x_power_supply_type,cwt_120w,CWT 120W
+x_power_supply_type,mean_well_120w,MEAN WELL 120W
+x_inox_plot_type,lohmann,Lohmann
+x_inox_plot_type,_3m,3M
