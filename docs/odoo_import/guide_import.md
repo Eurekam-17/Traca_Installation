@@ -101,6 +101,40 @@ avec un identifiant unique.
 2. Modifier le CSV exporté.
 3. Réimporter le même fichier.
 
+### Que se passe-t-il avec une cellule vide ?
+
+| Situation dans ton CSV | Comportement Odoo |
+|---|---|
+| Cellule **vide** (rien entre 2 virgules) | ✅ La valeur Odoo existante est **conservée** (pas d'écrasement). |
+| Colonne **absente du fichier** | ✅ Le champ n'est pas touché. |
+| Cellule contenant **une nouvelle valeur** | ⚠️ La valeur Odoo est **écrasée** (et le tracking logue le changement). |
+| Cellule remplie d'**un espace** ou d'un caractère invisible | 🔴 **Risque** d'écraser à `""` — toujours nettoyer le CSV. |
+
+⚠️ **Limite importante** : avec l'import natif, tu ne peux **pas vider**
+un champ déjà rempli. Pour supprimer une valeur existante, il faut le
+faire manuellement dans Odoo (ou via le logiciel Drugcam Traca).
+
+### 💡 Stratégie recommandée pour l'update — mini-CSV ciblés
+
+Plutôt que d'utiliser le gros template à 35 colonnes pour faire de l'update,
+fabrique des CSV ciblés ne contenant **que les colonnes à modifier** + la
+colonne `id` (ou `External ID`).
+
+**Exemple A — mettre à jour les objectifs caméras de 2 postes** :
+
+```csv
+id,x_camera_a_objective,x_camera_b_objective
+__export__.customer_asset_workstation_3337_xxxx,f8,f12
+__export__.customer_asset_workstation_3338_xxxx,f8,f12
+```
+
+→ Seuls les 2 champs spécifiés sont touchés. Les 33 autres champs des
+2 fiches restent intacts.
+
+**Exemple B — création initiale en masse** : utiliser le template
+complet `template_postes_assist.csv`, sans colonne `id`. Odoo créera
+de nouvelles fiches.
+
 ### Encodage
 
 - **Encodage** : UTF-8 (avec BOM si possible pour qu'Excel reconnaisse
