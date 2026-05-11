@@ -12,6 +12,62 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.2.3] — 2026-05-11
+
+### Ajouté
+- **Infrastructure de migration Odoo** complète, pour assurer la
+  reproductibilité de toutes les extensions Odoo créées (champs custom,
+  vues d'héritage, tracking, libellés) en cas de :
+  - changement d'instance Odoo,
+  - migration de version Odoo,
+  - écrasement / restauration de backup,
+  - provisionnement d'un nouvel environnement (pré-prod, démo).
+
+#### Source of truth
+- [`scripts/odoo_admin/odoo_extensions.json`](scripts/odoo_admin/odoo_extensions.json) :
+  fichier déclaratif unique listant les **22 champs custom** + **5 vues
+  d'héritage** + paramètres de tracking, avec leurs spécifications exactes.
+
+#### Scripts Python
+- [`scripts/odoo_admin/setup_drugcam_extensions.py`](scripts/odoo_admin/setup_drugcam_extensions.py) :
+  applique l'état déclaré dans le JSON. **Idempotent** (peut être lancé
+  N fois sans casser l'existant). Mode `--dry-run`. Confirmation
+  explicite par "OUI" tapé manuellement quand on cible la prod.
+- [`scripts/odoo_admin/verify_drugcam_extensions.py`](scripts/odoo_admin/verify_drugcam_extensions.py) :
+  audit en lecture seule. Compare l'état réel d'une instance avec le
+  JSON, sort un rapport `[OK]` / `[DIFF]` / `[MISSING]`. Code retour 0/1/2
+  pour usage en CI.
+
+#### Documentation Markdown ([`docs/odoo_admin/`](docs/odoo_admin/))
+- [`README.md`](docs/odoo_admin/README.md) : vue d'ensemble + workflow.
+- [`01_modele_workstation_fields.md`](docs/odoo_admin/01_modele_workstation_fields.md) :
+  inventaire des 22 champs (par section, avec selection complètes).
+- [`02_vues_heritage.md`](docs/odoo_admin/02_vues_heritage.md) :
+  les 5 vues, ce qu'elles font, leur xpath, leur priorité, pourquoi
+  elles sont séparées.
+- [`03_tracking.md`](docs/odoo_admin/03_tracking.md) : tracking Odoo,
+  format dans le chatter, désactivation éventuelle.
+- [`04_renommages_libelles.md`](docs/odoo_admin/04_renommages_libelles.md) :
+  Environnements → Serveurs Control, Postes → Postes Assist.
+- [`05_migration_checklist.md`](docs/odoo_admin/05_migration_checklist.md) :
+  procédure pas-à-pas pour porter le projet sur une nouvelle instance
+  (pré-requis Scalizer, configuration profil, audit, dry-run, application,
+  vérification, test fonctionnel).
+
+### Robustesse de la résolution des vues parentes
+Pour que `setup_drugcam_extensions.py` fonctionne sur n'importe quelle
+instance Odoo, les vues parentes Scalizer sont référencées par **nom
+technique** (`customer.asset.workstation.form`) et non par ID brut. Quand
+plusieurs vues partagent le même nom (cas de `res.partner.form.inherit`),
+un critère supplémentaire `inherit_view_arch_contains` permet de cibler
+précisément la bonne vue (ex : celle qui contient `workstation_ids`).
+
+### Aucun changement de code applicatif
+Patch 0.2.2 → 0.2.3 = uniquement infrastructure et documentation. Le
+logiciel principal continue de fonctionner exactement comme en 0.2.2.
+
+---
+
 ## [0.2.2] — 2026-05-11
 
 ### Ajouté
@@ -318,6 +374,7 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+[0.2.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.3
 [0.2.2]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.2
 [0.2.1]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.0

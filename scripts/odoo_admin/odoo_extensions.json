@@ -1,0 +1,266 @@
+{
+  "_meta": {
+    "version": "0.2.3",
+    "description": "Source of truth déclarative de toutes les extensions Odoo créées pour le projet Drugcam Traca. Lue par setup_drugcam_extensions.py et verify_drugcam_extensions.py.",
+    "target_module": "s6r_eurekam_customer_assets",
+    "doc": "Voir docs/odoo_admin/ pour le contexte humain."
+  },
+
+  "fields": [
+    {
+      "_section": "Identification matérielle (sur customer.asset.workstation)",
+      "model": "customer.asset.workstation",
+      "name": "x_workstation_type",
+      "field_description": "Type d'enceinte / hotte",
+      "ttype": "selection",
+      "selection": "[('iso_jce', 'Iso JCE'), ('iso_sieve', 'Iso Sieve'), ('iso_eurobio', 'Iso Eurobio'), ('iso_getinge', 'Iso Getinge'), ('hotte_faster', 'Hotte Faster'), ('hotte_thermofisher', 'Hotte Thermofisher'), ('hotte_ads', 'Hotte ADS'), ('hotte_berner', 'Hotte Berner'), ('autres', 'Autres')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_workstation_serial_number",
+      "field_description": "N° de série équipement",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_installation_date",
+      "field_description": "Date d'installation",
+      "ttype": "date",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "UC",
+      "model": "customer.asset.workstation",
+      "name": "x_uc_model",
+      "field_description": "Type UC",
+      "ttype": "selection",
+      "selection": "[('lian_li', 'LIAN LI'), ('ecw470', 'eCW470'), ('ecw475', 'eCW475')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_pc_serial_number",
+      "field_description": "N° de série PC",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_cpu_version",
+      "field_description": "Version CPU",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Bloc optique",
+      "model": "customer.asset.workstation",
+      "name": "x_optical_block_type",
+      "field_description": "Type de bloc optique",
+      "ttype": "selection",
+      "selection": "[('sortie_droite', 'Sortie droite'), ('sortie_laterale', 'Sortie latérale'), ('democom', 'Democom')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_optical_block_serial",
+      "field_description": "N° de série bloc optique",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Caméra A",
+      "model": "customer.asset.workstation",
+      "name": "x_camera_a_model",
+      "field_description": "Type caméra A",
+      "ttype": "selection",
+      "selection": "[('fire_wire', 'Fire wire'), ('bu_130', 'BU 130'), ('bu_160', 'BU 160'), ('alvium', 'Alvium')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_a_serial",
+      "field_description": "N° caméra A",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_a_objective",
+      "field_description": "Type objectif caméra A",
+      "ttype": "selection",
+      "selection": "[('f8', 'F8'), ('f12', 'F12')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_a_cable",
+      "field_description": "Type de câble caméra A",
+      "ttype": "selection",
+      "selection": "[('fire_wire', 'FIRE WIRE'), ('alysium', 'ALYSIUM'), ('alysium_v2', 'ALYSIUM V2'), ('alysium_blinde_teli', 'ALYSIUM BLINDÉ POUR TELI'), ('alysium_blinde_alvium', 'ALYSIUM BLINDÉ POUR ALVIUM')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Caméra B",
+      "model": "customer.asset.workstation",
+      "name": "x_camera_b_model",
+      "field_description": "Type caméra B",
+      "ttype": "selection",
+      "selection": "[('fire_wire', 'Fire wire'), ('bu_130', 'BU 130'), ('bu_160', 'BU 160'), ('alvium', 'Alvium')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_b_serial",
+      "field_description": "N° caméra B",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_b_objective",
+      "field_description": "Type objectif caméra B",
+      "ttype": "selection",
+      "selection": "[('f8', 'F8'), ('f12', 'F12')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_camera_b_cable",
+      "field_description": "Type de câble caméra B",
+      "ttype": "selection",
+      "selection": "[('fire_wire', 'FIRE WIRE'), ('alysium', 'ALYSIUM'), ('alysium_v2', 'ALYSIUM V2'), ('alysium_blinde_teli', 'ALYSIUM BLINDÉ POUR TELI'), ('alysium_blinde_alvium', 'ALYSIUM BLINDÉ POUR ALVIUM')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Caméra de scène",
+      "model": "customer.asset.workstation",
+      "name": "x_scene_camera_model",
+      "field_description": "Type caméra de scène",
+      "ttype": "selection",
+      "selection": "[('microsoft', 'Microsoft'), ('elp', 'ELP')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_scene_camera_serial",
+      "field_description": "N° caméra de scène",
+      "ttype": "char",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Accessoires",
+      "model": "customer.asset.workstation",
+      "name": "x_mouse_model",
+      "field_description": "Type de souris",
+      "ttype": "selection",
+      "selection": "[('sealshield', 'Sealshield'), ('silicone', 'Silicone'), ('tactile', 'Tactile'), ('induction', 'Induction')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_power_supply_type",
+      "field_description": "Bloc d'alimentation",
+      "ttype": "selection",
+      "selection": "[('c5_120w', 'C5 120W'), ('fsp_120w', 'FSP 120W'), ('meanwell_80w', 'MEANWELL 80W'), ('cwt_120w', 'CWT 120W'), ('mean_well_120w', 'MEAN WELL 120W')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+    {
+      "model": "customer.asset.workstation",
+      "name": "x_inox_plot_type",
+      "field_description": "Plots inox",
+      "ttype": "selection",
+      "selection": "[('lohmann', 'Lohmann'), ('_3m', '3M')]",
+      "tracking": 100,
+      "state": "manual"
+    },
+
+    {
+      "_section": "Texte libre",
+      "model": "customer.asset.workstation",
+      "name": "x_comments",
+      "field_description": "Commentaires",
+      "ttype": "text",
+      "tracking": 100,
+      "state": "manual"
+    }
+  ],
+
+  "views": [
+    {
+      "_section": "Vue form du poste : ajout des sections Drugcam",
+      "name": "customer.asset.workstation.form.eurekam_traca",
+      "model": "customer.asset.workstation",
+      "type": "form",
+      "inherit_view_name": "customer.asset.workstation.form",
+      "priority": 20,
+      "arch": "<xpath expr=\"//sheet/group\" position=\"after\">\n    <group string=\"Configuration matérielle Drugcam\">\n        <group string=\"Identification\">\n            <field name=\"x_workstation_type\"/>\n            <field name=\"x_workstation_serial_number\"/>\n            <field name=\"x_installation_date\"/>\n        </group>\n        <group string=\"UC\">\n            <field name=\"x_uc_model\"/>\n            <field name=\"x_pc_serial_number\"/>\n            <field name=\"x_cpu_version\"/>\n        </group>\n    </group>\n    <group>\n        <group string=\"Bloc optique\">\n            <field name=\"x_optical_block_type\"/>\n            <field name=\"x_optical_block_serial\"/>\n        </group>\n        <group string=\"Caméra de scène\">\n            <field name=\"x_scene_camera_model\"/>\n            <field name=\"x_scene_camera_serial\"/>\n        </group>\n    </group>\n    <group>\n        <group string=\"Caméra A (plus petit S/N)\">\n            <field name=\"x_camera_a_model\"/>\n            <field name=\"x_camera_a_serial\"/>\n            <field name=\"x_camera_a_objective\"/>\n            <field name=\"x_camera_a_cable\"/>\n        </group>\n        <group string=\"Caméra B (plus grand S/N)\">\n            <field name=\"x_camera_b_model\"/>\n            <field name=\"x_camera_b_serial\"/>\n            <field name=\"x_camera_b_objective\"/>\n            <field name=\"x_camera_b_cable\"/>\n        </group>\n    </group>\n    <group string=\"Accessoires\">\n        <group>\n            <field name=\"x_mouse_model\"/>\n            <field name=\"x_power_supply_type\"/>\n        </group>\n        <group>\n            <field name=\"x_inox_plot_type\"/>\n        </group>\n    </group>\n    <group string=\"Commentaires\">\n        <field name=\"x_comments\" nolabel=\"1\" placeholder=\"Notes libres sur l'installation de ce poste…\"/>\n    </group>\n</xpath>"
+    },
+    {
+      "_section": "Vue list standalone du poste : 22 colonnes optional",
+      "name": "customer.asset.workstation.list.eurekam_traca",
+      "model": "customer.asset.workstation",
+      "type": "list",
+      "inherit_view_name": "customer.asset.workstation.list",
+      "priority": 20,
+      "arch": "<xpath expr=\"//field[@name='access_type']\" position=\"after\">\n    <field name=\"x_workstation_type\" optional=\"hide\"/>\n    <field name=\"x_workstation_serial_number\" optional=\"hide\"/>\n    <field name=\"x_installation_date\" optional=\"hide\"/>\n    <field name=\"x_uc_model\" optional=\"hide\"/>\n    <field name=\"x_pc_serial_number\" optional=\"hide\"/>\n    <field name=\"x_cpu_version\" optional=\"hide\"/>\n    <field name=\"x_optical_block_type\" optional=\"hide\"/>\n    <field name=\"x_optical_block_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_a_model\" optional=\"hide\"/>\n    <field name=\"x_camera_a_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_a_objective\" optional=\"hide\"/>\n    <field name=\"x_camera_a_cable\" optional=\"hide\"/>\n    <field name=\"x_camera_b_model\" optional=\"hide\"/>\n    <field name=\"x_camera_b_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_b_objective\" optional=\"hide\"/>\n    <field name=\"x_camera_b_cable\" optional=\"hide\"/>\n    <field name=\"x_scene_camera_model\" optional=\"hide\"/>\n    <field name=\"x_scene_camera_serial\" optional=\"hide\"/>\n    <field name=\"x_mouse_model\" optional=\"hide\"/>\n    <field name=\"x_power_supply_type\" optional=\"hide\"/>\n    <field name=\"x_inox_plot_type\" optional=\"hide\"/>\n    <field name=\"x_comments\" optional=\"hide\"/>\n</xpath>"
+    },
+    {
+      "_section": "Vue list inline (onglet SAV res.partner) : 22 colonnes optional",
+      "name": "res.partner.form.eurekam_traca_workstation_columns",
+      "model": "res.partner",
+      "type": "form",
+      "inherit_view_name": "res.partner.form.inherit",
+      "inherit_view_arch_contains": "workstation_ids",
+      "priority": 25,
+      "arch": "<xpath expr=\"//field[@name='workstation_ids']/list/field[@name='access_type']\" position=\"after\">\n    <field name=\"x_workstation_type\" optional=\"hide\"/>\n    <field name=\"x_workstation_serial_number\" optional=\"hide\"/>\n    <field name=\"x_installation_date\" optional=\"hide\"/>\n    <field name=\"x_uc_model\" optional=\"hide\"/>\n    <field name=\"x_pc_serial_number\" optional=\"hide\"/>\n    <field name=\"x_cpu_version\" optional=\"hide\"/>\n    <field name=\"x_optical_block_type\" optional=\"hide\"/>\n    <field name=\"x_optical_block_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_a_model\" optional=\"hide\"/>\n    <field name=\"x_camera_a_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_a_objective\" optional=\"hide\"/>\n    <field name=\"x_camera_a_cable\" optional=\"hide\"/>\n    <field name=\"x_camera_b_model\" optional=\"hide\"/>\n    <field name=\"x_camera_b_serial\" optional=\"hide\"/>\n    <field name=\"x_camera_b_objective\" optional=\"hide\"/>\n    <field name=\"x_camera_b_cable\" optional=\"hide\"/>\n    <field name=\"x_scene_camera_model\" optional=\"hide\"/>\n    <field name=\"x_scene_camera_serial\" optional=\"hide\"/>\n    <field name=\"x_mouse_model\" optional=\"hide\"/>\n    <field name=\"x_power_supply_type\" optional=\"hide\"/>\n    <field name=\"x_inox_plot_type\" optional=\"hide\"/>\n    <field name=\"x_comments\" optional=\"hide\"/>\n</xpath>"
+    },
+    {
+      "_section": "Renommage titres SAV : Environnements → Serveurs Control / Postes → Postes Assist",
+      "name": "res.partner.form.eurekam_traca_section_titles",
+      "model": "res.partner",
+      "type": "form",
+      "inherit_view_name": "res.partner.form.inherit",
+      "inherit_view_arch_contains": "workstation_ids",
+      "priority": 26,
+      "arch": "<data>\n    <xpath expr=\"//field[@name='environement_ids']/..\" position=\"attributes\">\n        <attribute name=\"string\">Serveurs Control</attribute>\n    </xpath>\n    <xpath expr=\"//field[@name='workstation_ids']/..\" position=\"attributes\">\n        <attribute name=\"string\">Postes Assist</attribute>\n    </xpath>\n</data>"
+    },
+    {
+      "_section": "Retire editable=bottom du tableau Postes Assist (clic = ouvre form)",
+      "name": "res.partner.form.eurekam_traca_workstation_clickable",
+      "model": "res.partner",
+      "type": "form",
+      "inherit_view_name": "res.partner.form.inherit",
+      "inherit_view_arch_contains": "workstation_ids",
+      "priority": 27,
+      "arch": "<xpath expr=\"//field[@name='workstation_ids']/list\" position=\"attributes\">\n    <attribute name=\"editable\"/>\n</xpath>"
+    }
+  ]
+}
