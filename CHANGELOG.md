@@ -12,6 +12,24 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.2.1] — 2026-05-06
+
+### Ajouté
+- **Defaults métier** sur les objectifs caméra :
+  - `objectif_a` = **F8** par défaut (cas le plus fréquent chez Eurekam)
+  - `objectif_b` = **F12** par défaut
+- Présélection automatique de la valeur dans les combos Selection au
+  chargement du formulaire : si le draft contient déjà une valeur (cas des
+  defaults métier), l'item correspondant du `QComboBox` est sélectionné
+  visuellement. Le technicien peut toujours changer.
+- Test pytest dédié : `test_objectifs_have_defaults`.
+
+### Changé
+- `required_missing()` ne signale plus "Objectif caméra A/B" comme manquant
+  sur un draft vide (puisqu'ils ont désormais une valeur par défaut).
+
+---
+
 ## [0.2.0] — 2026-05-06
 
 > **Changement architectural majeur** suite à l'écrasement de la base
@@ -273,6 +291,7 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+[0.2.1]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.0
 [0.1.4]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.4
 [0.1.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.1.3

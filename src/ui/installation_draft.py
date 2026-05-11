@@ -38,8 +38,10 @@ class InstallationDraft:
     type_bloc_alim: str = ""           # Selection         → x_power_supply_type
     type_plot_inox: str = ""           # Selection         → x_inox_plot_type
     modele_uc: str = ""                # Selection         → x_uc_model
-    objectif_a: str = ""               # Selection f8/f12  → x_camera_a_objective
-    objectif_b: str = ""               # Selection         → x_camera_b_objective
+    # Defaults métier : F8 sur la caméra A, F12 sur la caméra B (cas le plus
+    # fréquent chez Eurekam). Le technicien peut toujours changer.
+    objectif_a: str = "f8"             # Selection f8/f12  → x_camera_a_objective
+    objectif_b: str = "f12"            # Selection         → x_camera_b_objective
     cable_a: str = ""                  # Selection         → x_camera_a_cable
     cable_b: str = ""                  # Selection         → x_camera_b_cable
     type_camera_a: str = ""            # Selection         → x_camera_a_model

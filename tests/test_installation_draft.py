@@ -55,6 +55,16 @@ class TestValidation:
         assert "N° de série équipement" in missing
         assert len(missing) >= 15
 
+    def test_objectifs_have_defaults(self) -> None:
+        """Defaults métier : objectif A=F8, objectif B=F12 ne sont pas manquants
+        sur un draft fraîchement créé (cas le plus fréquent chez Eurekam)."""
+        draft = InstallationDraft()
+        assert draft.objectif_a == "f8"
+        assert draft.objectif_b == "f12"
+        missing = draft.required_missing()
+        assert "Objectif caméra A" not in missing
+        assert "Objectif caméra B" not in missing
+
     def test_filled_draft_is_complete(self) -> None:
         assert _filled_draft().required_missing() == []
 

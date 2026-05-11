@@ -246,6 +246,16 @@ class FormStep(BaseStep):
                     f"⚠️ {filename} introuvable — saisie libre (vérifier valeur Odoo)"
                 )
 
+            # Présélection de la valeur déjà présente dans le draft.
+            # Cela permet aux defaults métier d'InstallationDraft (par ex.
+            # objectif_a='f8', objectif_b='f12') d'être visibles d'emblée
+            # dans les combos. Le technicien peut toujours changer.
+            current_value = getattr(self._draft, attr, "")
+            if current_value:
+                idx = combo.findData(current_value)
+                if idx >= 0:
+                    combo.setCurrentIndex(idx)
+
             combo.currentIndexChanged.connect(self._on_field_changed)
             if combo.lineEdit() is not None:
                 combo.lineEdit().textEdited.connect(lambda _: self._on_field_changed())
