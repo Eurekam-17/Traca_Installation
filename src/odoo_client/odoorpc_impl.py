@@ -134,7 +134,7 @@ class OdoorpcClient(OdooClientBase):
     def find_poste_by_serial(self, pc_serial: str) -> dict | None:
         """Cherche une fiche workstation portant déjà ce N° de série PC.
 
-        Recherche directe sur ``customer.asset.workstation.x_pc_serial_number``.
+        Recherche directe sur ``customer.asset.workstation.pc_serial_number``.
         Si trouvée, signal d'un poste déjà installé/enregistré au moins une fois.
         """
         if not pc_serial:
@@ -142,14 +142,14 @@ class OdoorpcClient(OdooClientBase):
         try:
             workstation_model = self._client.env[config.ODOO_MODEL_POSTE]
             records = workstation_model.search_read(
-                [("x_pc_serial_number", "=", pc_serial)],
-                ["id", "name", "partner_id", "x_workstation_serial_number",
-                 "x_installation_date"],
+                [("pc_serial_number", "=", pc_serial)],
+                ["id", "name", "partner_id", "workstation_serial_number",
+                 "installation_date"],
                 limit=1,
             )
         except odoorpc.error.RPCError as exc:
             logger.warning(
-                "Recherche de doublon impossible (champ x_pc_serial_number "
+                "Recherche de doublon impossible (champ pc_serial_number "
                 "introuvable ?) : %s", exc,
             )
             return None
@@ -163,8 +163,8 @@ class OdoorpcClient(OdooClientBase):
             "id": record["id"],
             "name": record.get("name", "?"),
             "customer_name": partner[1] if isinstance(partner, (list, tuple)) else "?",
-            "previous_serial": record.get("x_workstation_serial_number") or "?",
-            "previous_date": record.get("x_installation_date") or "?",
+            "previous_serial": record.get("workstation_serial_number") or "?",
+            "previous_date": record.get("installation_date") or "?",
         }
 
     # ------------------------------------------------------------------ #
@@ -184,11 +184,11 @@ class OdoorpcClient(OdooClientBase):
         return [r.get(field_name) or "" for r in records]
 
     def next_tracability_serial(self) -> str:
-        existing = self._existing_workstation_field_values("x_workstation_serial_number")
+        existing = self._existing_workstation_field_values("workstation_serial_number")
         return numbering.next_tracability_serial(existing)
 
     def next_optical_block_serial(self) -> str:
-        existing = self._existing_workstation_field_values("x_optical_block_serial")
+        existing = self._existing_workstation_field_values("optical_block_serial")
         return numbering.next_optical_block_serial(existing)
 
     # ------------------------------------------------------------------ #
@@ -225,7 +225,7 @@ class OdoorpcClient(OdooClientBase):
 
         Stratégie :
         1. Lookup d'une fiche existante par (partner_id, name=hostname)
-        2. Construction du payload complet (champs natifs Scalizer + champs x_*)
+        2. Construction du payload complet (champs natifs Scalizer + champs Drugcam)
         3. Si fiche trouvée → ``write()`` sur cet ID
         4. Sinon → ``create()`` d'une nouvelle fiche
         """
@@ -285,33 +285,33 @@ class OdoorpcClient(OdooClientBase):
             "software_fedora_version": data.os_version,
             "software_assist_version_id": self._resolve_assist_version_id(data.assist_version),
             "mac_address": data.mac_addresses,
-            # Identification matérielle (champs x_*)
-            "x_workstation_serial_number": data.workstation_serial_number,
-            "x_workstation_type": data.workstation_type or False,
-            "x_installation_date": data.installation_date or False,
+            # Identification matérielle (champs ajoutés par eurekam_drugcam_traca)
+            "workstation_serial_number": data.workstation_serial_number,
+            "workstation_type": data.workstation_type or False,
+            "installation_date": data.installation_date or False,
             # UC
-            "x_uc_model": data.uc_model or False,
-            "x_pc_serial_number": data.pc_serial_number,
-            "x_cpu_version": data.cpu_version,
+            "uc_model": data.uc_model or False,
+            "pc_serial_number": data.pc_serial_number,
+            "cpu_version": data.cpu_version,
             # Bloc optique
-            "x_optical_block_serial": data.optical_block_serial,
-            "x_optical_block_type": data.optical_block_type or False,
+            "optical_block_serial": data.optical_block_serial,
+            "optical_block_type": data.optical_block_type or False,
             # Caméras A et B
-            "x_camera_a_model": data.camera_a_model or False,
-            "x_camera_a_serial": data.camera_a_serial,
-            "x_camera_a_objective": data.camera_a_objective or False,
-            "x_camera_a_cable": data.camera_a_cable or False,
-            "x_camera_b_model": data.camera_b_model or False,
-            "x_camera_b_serial": data.camera_b_serial,
-            "x_camera_b_objective": data.camera_b_objective or False,
-            "x_camera_b_cable": data.camera_b_cable or False,
+            "camera_a_model": data.camera_a_model or False,
+            "camera_a_serial": data.camera_a_serial,
+            "camera_a_objective": data.camera_a_objective or False,
+            "camera_a_cable": data.camera_a_cable or False,
+            "camera_b_model": data.camera_b_model or False,
+            "camera_b_serial": data.camera_b_serial,
+            "camera_b_objective": data.camera_b_objective or False,
+            "camera_b_cable": data.camera_b_cable or False,
             # Caméra de scène
-            "x_scene_camera_model": data.scene_camera_model or False,
-            "x_scene_camera_serial": data.scene_camera_serial,
+            "scene_camera_model": data.scene_camera_model or False,
+            "scene_camera_serial": data.scene_camera_serial,
             # Accessoires
-            "x_mouse_model": data.souris or False,
-            "x_power_supply_type": data.bloc_alim or False,
-            "x_inox_plot_type": data.plots_inox or False,
+            "mouse_model": data.souris or False,
+            "power_supply_type": data.bloc_alim or False,
+            "inox_plot_type": data.plots_inox or False,
             # Commentaires libres
-            "x_comments": data.comments,
+            "comments": data.comments,
         }

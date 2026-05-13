@@ -7,7 +7,8 @@ chez un client, et envoie les données dans Odoo.
 > Spécifications complètes dans [`CLAUDE.md`](CLAUDE.md).
 > Historique des versions dans [`CHANGELOG.md`](CHANGELOG.md).
 > Import en masse via Excel/CSV : voir [`docs/odoo_import/`](docs/odoo_import/).
-> Migration / reproductibilité Odoo : voir [`docs/odoo_admin/`](docs/odoo_admin/).
+> Module Odoo associé (depuis v0.3.0) : [`odoo_module/eurekam_drugcam_traca/`](odoo_module/eurekam_drugcam_traca/).
+> Doc Odoo (incl. legacy Studio archivé) : [`docs/odoo_admin/`](docs/odoo_admin/).
 > Cible : **Rocky Linux 9 + KDE Plasma**, livraison **AppImage**.
 
 ---

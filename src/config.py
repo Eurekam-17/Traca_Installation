@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 # Pour ajouter un profil (ex : pré-prod), ajouter une entrée à PROFILES.
 PROFILES: dict[str, dict[str, str | int]] = {
     "staging": {
-        "label": "Recette (eurekam-recette)",
-        "host": "eurekam-recette.odoo.com",
-        "db": "eurekam-recette",
+        "label": "Sandbox (eurekam-sandbox-32137656)",
+        "host": "eurekam-sandbox.odoo.com",
+        "db": "eurekam-sandbox-32137656",
         "login": "traca-bot@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,

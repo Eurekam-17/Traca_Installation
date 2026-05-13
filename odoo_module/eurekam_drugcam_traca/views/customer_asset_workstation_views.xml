@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+    ============================================================
+    Vue form du poste : ajout des sections Drugcam après le bloc
+    natif Scalizer (description, partner, network, etc.).
+    ============================================================
+    -->
+    <record id="customer_asset_workstation_form_drugcam" model="ir.ui.view">
+        <field name="name">customer.asset.workstation.form.drugcam</field>
+        <field name="model">customer.asset.workstation</field>
+        <field name="inherit_id" ref="s6r_eurekam_customer_assets.view_customer_asset_workstations_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group string="Configuration matérielle Drugcam">
+                    <group string="Identification">
+                        <field name="workstation_type"/>
+                        <field name="workstation_serial_number"/>
+                        <field name="installation_date"/>
+                    </group>
+                    <group string="UC">
+                        <field name="uc_model"/>
+                        <field name="pc_serial_number"/>
+                        <field name="cpu_version"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Bloc optique">
+                        <field name="optical_block_type"/>
+                        <field name="optical_block_serial"/>
+                    </group>
+                    <group string="Caméra de scène">
+                        <field name="scene_camera_model"/>
+                        <field name="scene_camera_serial"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Caméra A (plus petit S/N)">
+                        <field name="camera_a_model"/>
+                        <field name="camera_a_serial"/>
+                        <field name="camera_a_objective"/>
+                        <field name="camera_a_cable"/>
+                    </group>
+                    <group string="Caméra B (plus grand S/N)">
+                        <field name="camera_b_model"/>
+                        <field name="camera_b_serial"/>
+                        <field name="camera_b_objective"/>
+                        <field name="camera_b_cable"/>
+                    </group>
+                </group>
+                <group string="Accessoires">
+                    <group>
+                        <field name="mouse_model"/>
+                        <field name="power_supply_type"/>
+                    </group>
+                    <group>
+                        <field name="inox_plot_type"/>
+                    </group>
+                </group>
+                <group string="Commentaires">
+                    <field name="comments" nolabel="1"
+                           placeholder="Notes libres sur l'installation de ce poste…"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+    ============================================================
+    Vue list standalone du poste : 22 colonnes Drugcam optionnelles.
+    Chacune en optional="hide" : visible via le sélecteur ⚙️.
+    ============================================================
+    -->
+    <record id="customer_asset_workstation_list_drugcam" model="ir.ui.view">
+        <field name="name">customer.asset.workstation.list.drugcam</field>
+        <field name="model">customer.asset.workstation</field>
+        <field name="inherit_id" ref="s6r_eurekam_customer_assets.view_customer_asset_workstations_list"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='access_type']" position="after">
+                <field name="workstation_type" optional="hide"/>
+                <field name="workstation_serial_number" optional="hide"/>
+                <field name="installation_date" optional="hide"/>
+                <field name="uc_model" optional="hide"/>
+                <field name="pc_serial_number" optional="hide"/>
+                <field name="cpu_version" optional="hide"/>
+                <field name="optical_block_type" optional="hide"/>
+                <field name="optical_block_serial" optional="hide"/>
+                <field name="camera_a_model" optional="hide"/>
+                <field name="camera_a_serial" optional="hide"/>
+                <field name="camera_a_objective" optional="hide"/>
+                <field name="camera_a_cable" optional="hide"/>
+                <field name="camera_b_model" optional="hide"/>
+                <field name="camera_b_serial" optional="hide"/>
+                <field name="camera_b_objective" optional="hide"/>
+                <field name="camera_b_cable" optional="hide"/>
+                <field name="scene_camera_model" optional="hide"/>
+                <field name="scene_camera_serial" optional="hide"/>
+                <field name="mouse_model" optional="hide"/>
+                <field name="power_supply_type" optional="hide"/>
+                <field name="inox_plot_type" optional="hide"/>
+                <field name="comments" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

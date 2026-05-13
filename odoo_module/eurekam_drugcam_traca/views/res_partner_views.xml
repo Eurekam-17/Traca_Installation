@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+    Les 3 vues d'héritage ci-dessous étendent la vue d'héritage Scalizer
+    qui ajoute l'onglet "SAV & Informations Techniques" sur la fiche
+    Contact (res.partner). Voir s6r_eurekam_customer_assets.view_partner_form_inherit.
+    -->
+
+    <!--
+    ============================================================
+    Vue 1 : Renomme les titres des deux groupes principaux
+    "Environnements" → "Serveurs Control"
+    "Postes" → "Postes Assist"
+    ============================================================
+    -->
+    <record id="res_partner_form_drugcam_section_titles" model="ir.ui.view">
+        <field name="name">res.partner.form.drugcam_section_titles</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="s6r_eurekam_customer_assets.view_partner_form_inherit"/>
+        <field name="priority">26</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='environement_ids']/.." position="attributes">
+                <attribute name="string">Serveurs Control</attribute>
+            </xpath>
+            <xpath expr="//field[@name='workstation_ids']/.." position="attributes">
+                <attribute name="string">Postes Assist</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+    ============================================================
+    Vue 2 : Ajoute les 22 colonnes Drugcam dans la <list> inline du
+    tableau "Postes Assist" (toutes en optional="hide", cochables via
+    le sélecteur ⚙️ du tableau).
+    ============================================================
+    -->
+    <record id="res_partner_form_drugcam_workstation_columns" model="ir.ui.view">
+        <field name="name">res.partner.form.drugcam_workstation_columns</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="s6r_eurekam_customer_assets.view_partner_form_inherit"/>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='workstation_ids']/list/field[@name='access_type']"
+                   position="after">
+                <field name="workstation_type" optional="hide"/>
+                <field name="workstation_serial_number" optional="hide"/>
+                <field name="installation_date" optional="hide"/>
+                <field name="uc_model" optional="hide"/>
+                <field name="pc_serial_number" optional="hide"/>
+                <field name="cpu_version" optional="hide"/>
+                <field name="optical_block_type" optional="hide"/>
+                <field name="optical_block_serial" optional="hide"/>
+                <field name="camera_a_model" optional="hide"/>
+                <field name="camera_a_serial" optional="hide"/>
+                <field name="camera_a_objective" optional="hide"/>
+                <field name="camera_a_cable" optional="hide"/>
+                <field name="camera_b_model" optional="hide"/>
+                <field name="camera_b_serial" optional="hide"/>
+                <field name="camera_b_objective" optional="hide"/>
+                <field name="camera_b_cable" optional="hide"/>
+                <field name="scene_camera_model" optional="hide"/>
+                <field name="scene_camera_serial" optional="hide"/>
+                <field name="mouse_model" optional="hide"/>
+                <field name="power_supply_type" optional="hide"/>
+                <field name="inox_plot_type" optional="hide"/>
+                <field name="comments" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+    ============================================================
+    Vue 3 : Retire l'attribut editable="bottom" de la liste inline
+    pour qu'un clic sur une ligne ouvre la vue formulaire complète
+    (au lieu d'éditer en place).
+    ============================================================
+    -->
+    <record id="res_partner_form_drugcam_workstation_clickable" model="ir.ui.view">
+        <field name="name">res.partner.form.drugcam_workstation_clickable</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="s6r_eurekam_customer_assets.view_partner_form_inherit"/>
+        <field name="priority">27</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='workstation_ids']/list" position="attributes">
+                <attribute name="editable"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

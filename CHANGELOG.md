@@ -12,6 +12,56 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.3.0] — 2026-05-11
+
+> **Changement architectural majeur côté Odoo** : abandon de l'approche
+> Studio (`state='manual'`) au profit d'un **vrai module Odoo**, sur
+> recommandation du prestataire pour la stabilité long-terme.
+
+### Ajouté
+- **Nouveau module Odoo** [`odoo_module/eurekam_drugcam_traca/`](odoo_module/eurekam_drugcam_traca/) :
+  - `__manifest__.py` (Odoo 18, dépend de `s6r_eurekam_customer_assets`)
+  - `models/customer_asset_workstation.py` : 22 champs métier en Python avec `tracking=True`
+  - `views/customer_asset_workstation_views.xml` : 2 héritages (form + list)
+  - `views/res_partner_views.xml` : 3 héritages (titres SAV + colonnes + clic)
+  - `tests/test_customer_asset_workstation.py` : 4 tests Odoo (présence champs, Selections, payload complet, tracking)
+  - `README.md` + `CHANGELOG.md` du module
+- [`docs/odoo_admin/legacy_studio/`](docs/odoo_admin/legacy_studio/) :
+  archive complète de l'ancienne approche Studio (JSON déclaratif,
+  scripts setup/verify, 5 fichiers Markdown). Conservée pour traçabilité
+  historique. Voir le `STATUS.md` du dossier.
+
+### Modifié
+- **Champs Odoo renommés** : suppression du préfixe `x_` car il n'est
+  plus nécessaire dans un vrai module Odoo (le `x_` est une convention
+  Studio pour les champs `state='manual'`).
+  - `x_workstation_type` → `workstation_type`
+  - `x_pc_serial_number` → `pc_serial_number`
+  - … (les 22 champs renommés au total)
+- [`src/odoo_client/odoorpc_impl.py`](src/odoo_client/odoorpc_impl.py) :
+  mapping mis à jour pour utiliser les nouveaux noms (sans `x_`).
+- [`docs/odoo_admin/README.md`](docs/odoo_admin/README.md) : pointe
+  désormais vers le module Odoo et explique la transition.
+
+### Supprimé
+- `scripts/odoo_admin/` (déplacé vers `docs/odoo_admin/legacy_studio/`).
+
+### Inchangé
+- Logiciel `drugcam-traca` (Python/Qt) : fonctionnement identique. Seul
+  le mapping interne des noms de champs Odoo change. 39 tests pytest
+  passent toujours.
+- Profils `staging` (sandbox) et `prod` dans `src/config.py`.
+- Fichiers `data_options/*.json` (les valeurs Selection sont identiques).
+
+### Procédure de mise en route post-v0.3.0
+1. Faire installer le module `odoo_module/eurekam_drugcam_traca/` sur
+   l'instance sandbox Odoo.sh (côté Loïc, Scalizer ou autre prestataire).
+2. Le module crée automatiquement les 22 champs + 5 vues lors de l'install.
+3. Lancer le logiciel `drugcam-traca` sur sandbox → tester un envoi.
+4. Si OK : déployer le module sur la prod.
+
+---
+
 ## [0.2.3] — 2026-05-11
 
 ### Ajouté
@@ -374,6 +424,7 @@ logiciel principal continue de fonctionner exactement comme en 0.2.2.
 
 ---
 
+[0.3.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.3.0
 [0.2.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.3
 [0.2.2]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.2
 [0.2.1]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.1
