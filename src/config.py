@@ -42,7 +42,9 @@ PROFILES: dict[str, dict[str, str | int]] = {
     "prod": {
         "label": "Production (eurekam.odoo.com)",
         "host": "eurekam.odoo.com",
-        "db": "eurekam",
+        # Nom interne Odoo.sh de la base prod (différent du sous-domaine
+        # public qui est juste `eurekam`). Confirmé par Loïc le 2026-05-15.
+        "db": "tecliberp-eurekam-main-7835310",
         "login": "traca-bot@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,
