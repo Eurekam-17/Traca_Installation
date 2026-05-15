@@ -29,25 +29,25 @@ def _full_poste(serial: str = "AB000042", block: str = "010013") -> PosteData:
         workstation_serial_number=serial,
         workstation_type="iso_jce",
         installation_date="2026-05-06",
-        # UC
-        uc_model="lian_li",
+        # UC (Many2one product.template depuis v0.4.0)
+        uc_model_id=2101,
         pc_serial_number="ABC1234",
         cpu_version="Intel(R) Core(TM) i5-10500 CPU @ 3.10GHz",
         # Bloc optique
         optical_block_serial=block,
         optical_block_type="sortie_droite",
-        # Caméra A
-        camera_a_model="alvium",
+        # Caméra A (modèle + objectif = Many2one product, S/N = libre)
+        camera_a_model_id=2001,
         camera_a_serial="00050",
-        camera_a_objective="f8",
+        camera_a_objective_id=2201,
         camera_a_cable="alysium",
         # Caméra B
-        camera_b_model="alvium",
+        camera_b_model_id=2001,
         camera_b_serial="00100",
-        camera_b_objective="f8",
+        camera_b_objective_id=2201,
         camera_b_cable="alysium",
-        # Caméra de scène
-        scene_camera_model="microsoft",
+        # Caméra de scène (Many2one product.template, même catégorie que cam A/B)
+        scene_camera_model_id=2004,
         scene_camera_serial="SC-001",
         # Accessoires
         souris="sealshield",
@@ -123,3 +123,31 @@ class TestUpsert:
         assert new_id > 0
         # Sans serial fournis, les pools n'ont pas été modifiés
         assert authenticated_client.next_tracability_serial() == "AB000042"
+
+
+class TestProductCatalog:
+    """v0.4.0 : 3 nouvelles méthodes pour peupler les combos depuis Odoo."""
+
+    def test_list_camera_products_returns_cameras(self, authenticated_client) -> None:
+        cameras = authenticated_client.list_camera_products()
+        assert len(cameras) >= 4  # 3 CAMERA + 1 Caméra de scène
+        assert all(c.odoo_id > 0 for c in cameras)
+        names = [c.name for c in cameras]
+        # Vérifie qu'on a bien des CAMERA majuscule ET Caméra accent (cf. v0.4.0)
+        assert any(n.startswith("CAMERA ") for n in names)
+        assert any(n.startswith("Caméra ") for n in names)
+
+    def test_list_pc_products_returns_pcs(self, authenticated_client) -> None:
+        pcs = authenticated_client.list_pc_products()
+        assert len(pcs) >= 2
+        assert all(p.name.startswith("PC ") for p in pcs)
+
+    def test_list_objective_products_returns_objectives(self, authenticated_client) -> None:
+        objs = authenticated_client.list_objective_products()
+        assert len(objs) >= 2
+        assert all(o.name.startswith("Objectif ") for o in objs)
+
+    def test_catalog_methods_require_authentication(self) -> None:
+        client = MockOdooClient()
+        with pytest.raises(RuntimeError, match="authenticate"):
+            client.list_camera_products()

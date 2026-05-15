@@ -12,6 +12,61 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.4.0] — 2026-05-15
+
+> **Évolution structurelle** : 6 champs (Type Caméra A/B/scène, Type UC,
+> Type Objectif A/B) passent de **Selection** à **Many2one
+> `product.template`**. Permet d'enrichir le catalogue produits dans Odoo
+> sans toucher au code du module (recommandation Loïc / équipe Eurekam).
+
+### Côté module Odoo `eurekam_drugcam_traca` (bump → 18.0.2.0.0)
+- **6 champs transformés en Many2one vers `product.template`** :
+  - `camera_a_model`, `camera_b_model`, `scene_camera_model` (caméras)
+  - `uc_model` (PC)
+  - `camera_a_objective`, `camera_b_objective` (objectifs)
+- **Domaines de filtrage** côté Odoo (cf. `models/customer_asset_workstation.py`) :
+  - Caméras : `name =ilike "CAMERA %" OR name =ilike "Caméra %"`
+  - PC : `name =ilike "PC %"`
+  - Objectifs : `name =ilike "Objectif %"`
+- Tracking natif conservé (Many2one trackés dans le chatter avec
+  affichage du nom du produit).
+- Tests Odoo enrichis : présence des Many2one, validation du domaine
+  caméra qui exclut les "SUPPORT CAMERAS".
+
+### Côté logiciel `drugcam-traca` (Python/Qt)
+- **Renommage de 6 attributs** dans `PosteData` et `InstallationDraft` :
+  les champs concernés deviennent `*_id: int` au lieu de `str`
+  (ex `uc_model_id` au lieu de `uc_model`, `camera_a_model_id` au lieu de
+  `camera_a_model`, etc.)
+- **3 nouvelles méthodes** dans `OdooClientBase` (et leurs implémentations
+  réelle + mock) :
+  - `list_camera_products() -> list[Product]`
+  - `list_pc_products() -> list[Product]`
+  - `list_objective_products() -> list[Product]`
+- **Nouvelle dataclass `Product`** dans `base.py` (`odoo_id`, `name`).
+- **GUI step 2 enrichie** : nouvelle section "Articles catalogue Odoo"
+  avec 6 combos peuplés dynamiquement au démarrage depuis le catalogue
+  Odoo. Si un combo est vide (aucun article matche la convention de nom),
+  il est désactivé avec un tooltip d'aide.
+- **Suppression des 6 fichiers `data_options/*.json`** devenus obsolètes
+  (les listes viennent désormais d'Odoo) :
+  - `type_camera_a.json`, `type_camera_b.json`, `scene_camera_model.json`
+  - `modele_uc.json`
+  - `objectif_a.json`, `objectif_b.json`
+
+### Tests
+- 43 tests pytest passent (+ 4 nouveaux tests sur `TestProductCatalog`).
+- Tests Odoo du module : nouveau test `test_camera_uc_objective_are_many2one_to_product_template`.
+
+### Pré-requis post-installation (côté Odoo)
+- Avant la première utilisation, créer dans le catalogue Odoo les
+  articles correspondants avec les bons préfixes de nom (`CAMERA `,
+  `Caméra `, `PC `, `Objectif `). Sinon les combos GUI seront vides.
+- Les articles existants chez Eurekam respectent déjà ces conventions
+  (cf. captures d'écran fournies par Loïc le 2026-05-15).
+
+---
+
 ## [0.3.0] — 2026-05-11
 
 > **Changement architectural majeur côté Odoo** : abandon de l'approche
@@ -424,6 +479,7 @@ logiciel principal continue de fonctionner exactement comme en 0.2.2.
 
 ---
 
+[0.4.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.3.0
 [0.2.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.3
 [0.2.2]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.2

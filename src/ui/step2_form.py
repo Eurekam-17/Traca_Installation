@@ -96,21 +96,17 @@ class FormStep(BaseStep):
 
     draft_updated = Signal(InstallationDraft)
 
-    # Cartographie : nom de fichier JSON → attribut du draft à mettre à jour.
+    # ───────────────────────────────────────────────────────────────────
+    # Champs Selection (valeurs locales depuis data_options/*.json).
     # L'ordre des entrées détermine l'ordre d'affichage dans le formulaire.
-    # ⚠️ Les valeurs (`value`) des JSON DOIVENT correspondre aux valeurs
-    # techniques des Selections Odoo, sinon les inserts seront rejetés.
+    # ⚠️ Les `value` des JSON DOIVENT correspondre aux valeurs techniques
+    # des Selections Odoo, sinon les inserts seront rejetés.
+    # ───────────────────────────────────────────────────────────────────
     DATA_OPTIONS_FILES: dict[str, str] = {
         "workstation_type.json": "workstation_type",
-        "modele_uc.json": "modele_uc",
         "type_bloc_optique.json": "type_bloc_optique",
-        "type_camera_a.json": "type_camera_a",
-        "objectif_a.json": "objectif_a",
         "cable_a.json": "cable_a",
-        "type_camera_b.json": "type_camera_b",
-        "objectif_b.json": "objectif_b",
         "cable_b.json": "cable_b",
-        "scene_camera_model.json": "scene_camera_model",
         "souris.json": "souris",
         "type_bloc_alimentation.json": "type_bloc_alim",
         "type_plot_inox.json": "type_plot_inox",
@@ -118,19 +114,29 @@ class FormStep(BaseStep):
 
     DATA_OPTIONS_LABELS: dict[str, str] = {
         "workstation_type": "Type d'enceinte/hotte",
-        "modele_uc": "Type UC",
         "type_bloc_optique": "Type de bloc optique",
-        "type_camera_a": "Type caméra A",
-        "objectif_a": "Objectif caméra A",
         "cable_a": "Type câble caméra A",
-        "type_camera_b": "Type caméra B",
-        "objectif_b": "Objectif caméra B",
         "cable_b": "Type câble caméra B",
-        "scene_camera_model": "Type caméra de scène",
         "souris": "Type de souris",
         "type_bloc_alim": "Bloc d'alimentation",
         "type_plot_inox": "Plots inox",
     }
+
+    # ───────────────────────────────────────────────────────────────────
+    # Champs Many2one product.template (depuis v0.4.0).
+    # La liste d'options est chargée dynamiquement depuis Odoo via
+    # OdooClientBase.list_*_products() — pas de JSON local.
+    # Mapping : attribut du draft → (libellé, méthode du client)
+    # ───────────────────────────────────────────────────────────────────
+    PRODUCT_FIELDS: list[tuple[str, str, str]] = [
+        # (attr du draft, libellé, nom de méthode sur le client Odoo)
+        ("modele_uc_id", "Type UC", "list_pc_products"),
+        ("type_camera_a_id", "Type caméra A", "list_camera_products"),
+        ("objectif_a_id", "Objectif caméra A", "list_objective_products"),
+        ("type_camera_b_id", "Type caméra B", "list_camera_products"),
+        ("objectif_b_id", "Objectif caméra B", "list_objective_products"),
+        ("scene_camera_model_id", "Type caméra de scène", "list_camera_products"),
+    ]
 
     # Champs libres saisis manuellement (Char/Text) — mapping draft attr → label
     FREE_TEXT_FIELDS: dict[str, str] = {
@@ -152,6 +158,8 @@ class FormStep(BaseStep):
         self._worker: _CollectionWorker | None = None
         self._auto_field_widgets: dict[str, QLineEdit] = {}
         self._manual_combos: dict[str, QComboBox] = {}
+        # Combos pour les Many2one product.template (clé = attr du draft)
+        self._product_combos: dict[str, QComboBox] = {}
         self._free_text_inputs: dict[str, QLineEdit | QTextEdit] = {}
         self._serial_eq_input: QLineEdit | None = None
         self._serial_block_input: QLineEdit | None = None
@@ -263,6 +271,58 @@ class FormStep(BaseStep):
             manual_form.addRow(self.DATA_OPTIONS_LABELS[attr] + " *", combo)
 
         layout.addWidget(manual_box)
+
+        # — Section Articles Odoo (Many2one product.template) ─────────────
+        # Les listes sont peuplées dynamiquement depuis le catalogue Odoo
+        # (cf. méthodes list_*_products de OdooClientBase). Si Odoo est
+        # injoignable, les combos restent vides et l'utilisateur ne peut
+        # pas valider — un message d'aide indique de vérifier la connexion.
+        product_box = QGroupBox("Articles catalogue Odoo (* = obligatoire)")
+        product_form = QFormLayout(product_box)
+        product_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        # Cache des listes de produits par méthode (évite plusieurs appels
+        # API si plusieurs combos partagent la même source — ex. les 3 combos
+        # caméra A/B/scène appellent tous list_camera_products).
+        product_cache: dict[str, list] = {}
+
+        for attr, label, method_name in self.PRODUCT_FIELDS:
+            combo = QComboBox()
+            combo.addItem("— Sélectionner —", userData=0)
+            try:
+                if method_name not in product_cache:
+                    product_cache[method_name] = getattr(self._client, method_name)()
+                products = product_cache[method_name]
+                if not products:
+                    logger.warning(
+                        "Aucun produit retourné par %s — combo %s sera vide.",
+                        method_name, attr,
+                    )
+                    combo.setEnabled(False)
+                    combo.setToolTip(
+                        "Aucun article correspondant trouvé dans le catalogue Odoo. "
+                        "Vérifier que des produits avec le bon préfixe de nom existent."
+                    )
+                else:
+                    for p in products:
+                        combo.addItem(p.name, userData=p.odoo_id)
+            except Exception as exc:  # noqa: BLE001
+                logger.error("Chargement %s en échec : %s", method_name, exc)
+                combo.setEnabled(False)
+                combo.setToolTip(f"Erreur de chargement Odoo : {exc}")
+
+            # Présélection si l'attribut du draft contient déjà un id
+            current_id = getattr(self._draft, attr, 0)
+            if current_id:
+                idx = combo.findData(current_id)
+                if idx >= 0:
+                    combo.setCurrentIndex(idx)
+
+            combo.currentIndexChanged.connect(self._on_field_changed)
+            self._product_combos[attr] = combo
+            product_form.addRow(label + " *", combo)
+
+        layout.addWidget(product_box)
 
         # — Section Champs libres (texte saisi par le technicien)
         free_box = QGroupBox("Saisies libres (optionnelles)")
@@ -447,6 +507,12 @@ class FormStep(BaseStep):
                 data = combo.currentData()
                 value = data if data else text
             setattr(self._draft, attr, value)
+
+        # Combos produits Odoo (Many2one product.template, depuis v0.4.0)
+        # currentData() retourne l'ID Odoo (int) ou 0 si placeholder sélectionné.
+        for attr, combo in self._product_combos.items():
+            product_id = combo.currentData() or 0
+            setattr(self._draft, attr, int(product_id))
 
         # Champs libres (Char/Text)
         for attr, widget in self._free_text_inputs.items():

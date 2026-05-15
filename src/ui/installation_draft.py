@@ -28,25 +28,23 @@ class InstallationDraft:
     # Étape 2 — collecte automatique + saisies manuelles
     system_info: SystemInfo | None = None
 
-    # Saisies manuelles. Pour les champs Selection (workstation_type,
-    # uc_model, etc.) la valeur stockée doit être la **valeur technique**
-    # (snake_case) telle que définie dans les data_options/*.json — c'est
-    # ce qui sera envoyé à Odoo (qui rejettera tout libellé).
-    souris: str = ""                   # Selection         → x_mouse_model
-    workstation_type: str = ""         # Selection         → x_workstation_type
-    type_bloc_optique: str = ""        # Selection         → x_optical_block_type
-    type_bloc_alim: str = ""           # Selection         → x_power_supply_type
-    type_plot_inox: str = ""           # Selection         → x_inox_plot_type
-    modele_uc: str = ""                # Selection         → x_uc_model
-    # Defaults métier : F8 sur la caméra A, F12 sur la caméra B (cas le plus
-    # fréquent chez Eurekam). Le technicien peut toujours changer.
-    objectif_a: str = "f8"             # Selection f8/f12  → x_camera_a_objective
-    objectif_b: str = "f12"            # Selection         → x_camera_b_objective
-    cable_a: str = ""                  # Selection         → x_camera_a_cable
-    cable_b: str = ""                  # Selection         → x_camera_b_cable
-    type_camera_a: str = ""            # Selection         → x_camera_a_model
-    type_camera_b: str = ""            # Selection         → x_camera_b_model
-    scene_camera_model: str = ""       # Selection         → x_scene_camera_model
+    # Saisies manuelles, deux types depuis v0.4.0 :
+    # - Selections classiques (valeur technique snake_case) → str
+    # - Many2one product.template (Type Caméra/UC/Objectif) → int (id Odoo, 0 = vide)
+    souris: str = ""                       # Selection         → mouse_model
+    workstation_type: str = ""             # Selection         → workstation_type
+    type_bloc_optique: str = ""            # Selection         → optical_block_type
+    type_bloc_alim: str = ""               # Selection         → power_supply_type
+    type_plot_inox: str = ""               # Selection         → inox_plot_type
+    cable_a: str = ""                      # Selection         → camera_a_cable
+    cable_b: str = ""                      # Selection         → camera_b_cable
+    # Many2one vers product.template (depuis v0.4.0)
+    modele_uc_id: int = 0                  # Many2one          → uc_model
+    objectif_a_id: int = 0                 # Many2one          → camera_a_objective
+    objectif_b_id: int = 0                 # Many2one          → camera_b_objective
+    type_camera_a_id: int = 0              # Many2one          → camera_a_model
+    type_camera_b_id: int = 0              # Many2one          → camera_b_model
+    scene_camera_model_id: int = 0         # Many2one          → scene_camera_model
 
     # Saisies libres (Char/Text)
     workstation_name: str = ""             # libre         → x_workstation_name
@@ -130,12 +128,12 @@ class InstallationDraft:
             "Version Assist": bool(self.get("assist_version")),
             "Adresses MAC": bool(self.get("mac_addresses")),
             "Type d'enceinte/hotte": bool(self.workstation_type),
-            "Type UC": bool(self.modele_uc),
+            "Type UC": bool(self.modele_uc_id),
             "Type de bloc optique": bool(self.type_bloc_optique),
-            "Type caméra A": bool(self.type_camera_a),
-            "Type caméra B": bool(self.type_camera_b),
-            "Objectif caméra A": bool(self.objectif_a),
-            "Objectif caméra B": bool(self.objectif_b),
+            "Type caméra A": bool(self.type_camera_a_id),
+            "Type caméra B": bool(self.type_camera_b_id),
+            "Objectif caméra A": bool(self.objectif_a_id),
+            "Objectif caméra B": bool(self.objectif_b_id),
             "Type câble caméra A": bool(self.cable_a),
             "Type câble caméra B": bool(self.cable_b),
             "Type de souris": bool(self.souris),
@@ -173,25 +171,25 @@ class InstallationDraft:
             workstation_serial_number=self.serial_number,
             workstation_type=self.workstation_type,
             installation_date=installation_date,
-            # UC
-            uc_model=self.modele_uc,
+            # UC (Many2one product.template depuis v0.4.0)
+            uc_model_id=self.modele_uc_id,
             pc_serial_number=self.get("pc_serial_number"),
             cpu_version=self.get("cpu_version"),
             # Bloc optique
             optical_block_serial=self.optical_block_serial,
             optical_block_type=self.type_bloc_optique,
-            # Caméra A : modèle = Selection saisie ; S/N = collecte sysfs
-            camera_a_model=self.type_camera_a,
+            # Caméra A : modèle/objectif = Many2one product, S/N = collecte sysfs
+            camera_a_model_id=self.type_camera_a_id,
             camera_a_serial=self.camera_a_serial,
-            camera_a_objective=self.objectif_a,
+            camera_a_objective_id=self.objectif_a_id,
             camera_a_cable=self.cable_a,
             # Caméra B
-            camera_b_model=self.type_camera_b,
+            camera_b_model_id=self.type_camera_b_id,
             camera_b_serial=self.camera_b_serial,
-            camera_b_objective=self.objectif_b,
+            camera_b_objective_id=self.objectif_b_id,
             camera_b_cable=self.cable_b,
-            # Caméra de scène
-            scene_camera_model=self.scene_camera_model,
+            # Caméra de scène (Many2one product, même filtre que cam A/B)
+            scene_camera_model_id=self.scene_camera_model_id,
             scene_camera_serial=self.scene_camera_serial,
             # Accessoires
             souris=self.souris,

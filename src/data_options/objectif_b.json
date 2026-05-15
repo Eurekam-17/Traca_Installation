@@ -1,8 +1,0 @@
-{
-  "_comment": "Type d'objectif caméra B. Les 'value' correspondent aux valeurs techniques du champ Selection x_camera_b_objective côté Odoo.",
-  "label": "Type d'objectif caméra B",
-  "options": [
-    { "display": "F8", "value": "f8" },
-    { "display": "F12", "value": "f12" }
-  ]
-}

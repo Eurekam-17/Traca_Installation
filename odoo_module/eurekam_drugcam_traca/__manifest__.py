@@ -25,7 +25,7 @@ Toutes les modifications sont trackées dans le chatter (audit Odoo natif).
 Logiciel client associé :
 https://github.com/Eurekam-17/Traca_Installation
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.2.0.0",
     "category": "Customizations",
     "author": "Eurekam",
     "website": "https://eurekam.fr",

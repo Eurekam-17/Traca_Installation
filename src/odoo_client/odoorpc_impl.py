@@ -27,7 +27,14 @@ from .base import (
     OdooConnectionError,
     OdooWriteError,
     PosteData,
+    Product,
 )
+
+
+# Domaines de filtrage product.template (cohérents avec ceux du module Odoo)
+_DOMAIN_CAMERA = ["|", ("name", "=ilike", "CAMERA %"), ("name", "=ilike", "Caméra %")]
+_DOMAIN_PC = [("name", "=ilike", "PC %")]
+_DOMAIN_OBJECTIVE = [("name", "=ilike", "Objectif %")]
 
 logger = logging.getLogger(__name__)
 
@@ -275,8 +282,10 @@ class OdoorpcClient(OdooClientBase):
     def _build_workstation_payload(self, data: PosteData) -> dict[str, Any]:
         """Construit le payload complet pour customer.asset.workstation.
 
-        Les Selections vides sont envoyées en ``False`` (Odoo refuserait ``""``
-        comme valeur de Selection).
+        - Les Selections vides sont envoyées en ``False`` (Odoo refuserait ``""``).
+        - Les Many2one (camera_*_model, uc_model, camera_*_objective,
+          scene_camera_model) attendent un ID entier ; ``0`` est traité comme
+          ``False`` (NULL Odoo).
         """
         return {
             # Champs natifs Scalizer
@@ -285,28 +294,29 @@ class OdoorpcClient(OdooClientBase):
             "software_fedora_version": data.os_version,
             "software_assist_version_id": self._resolve_assist_version_id(data.assist_version),
             "mac_address": data.mac_addresses,
-            # Identification matérielle (champs ajoutés par eurekam_drugcam_traca)
+            # Identification matérielle
             "workstation_serial_number": data.workstation_serial_number,
             "workstation_type": data.workstation_type or False,
             "installation_date": data.installation_date or False,
-            # UC
-            "uc_model": data.uc_model or False,
+            # UC (Many2one product.template)
+            "uc_model": data.uc_model_id or False,
             "pc_serial_number": data.pc_serial_number,
             "cpu_version": data.cpu_version,
             # Bloc optique
             "optical_block_serial": data.optical_block_serial,
             "optical_block_type": data.optical_block_type or False,
-            # Caméras A et B
-            "camera_a_model": data.camera_a_model or False,
+            # Caméra A (Many2one product.template pour modèle + objectif)
+            "camera_a_model": data.camera_a_model_id or False,
             "camera_a_serial": data.camera_a_serial,
-            "camera_a_objective": data.camera_a_objective or False,
+            "camera_a_objective": data.camera_a_objective_id or False,
             "camera_a_cable": data.camera_a_cable or False,
-            "camera_b_model": data.camera_b_model or False,
+            # Caméra B
+            "camera_b_model": data.camera_b_model_id or False,
             "camera_b_serial": data.camera_b_serial,
-            "camera_b_objective": data.camera_b_objective or False,
+            "camera_b_objective": data.camera_b_objective_id or False,
             "camera_b_cable": data.camera_b_cable or False,
-            # Caméra de scène
-            "scene_camera_model": data.scene_camera_model or False,
+            # Caméra de scène (Many2one product.template, même filtre que cam A/B)
+            "scene_camera_model": data.scene_camera_model_id or False,
             "scene_camera_serial": data.scene_camera_serial,
             # Accessoires
             "mouse_model": data.souris or False,
@@ -315,3 +325,25 @@ class OdoorpcClient(OdooClientBase):
             # Commentaires libres
             "comments": data.comments,
         }
+
+    # ------------------------------------------------------------------ #
+    # Catalogue produits (depuis v0.4.0)
+    # ------------------------------------------------------------------ #
+    def _list_products(self, domain: list, label: str) -> list[Product]:
+        """Helper : exécute search_read sur product.template avec un domaine."""
+        try:
+            model = self._client.env["product.template"]
+            records = model.search_read(domain, ["id", "name"], order="name asc")
+        except odoorpc.error.RPCError as exc:
+            logger.warning("Lecture product.template (%s) impossible : %s", label, exc)
+            return []
+        return [Product(odoo_id=r["id"], name=r["name"]) for r in records]
+
+    def list_camera_products(self) -> list[Product]:
+        return self._list_products(_DOMAIN_CAMERA, "caméras")
+
+    def list_pc_products(self) -> list[Product]:
+        return self._list_products(_DOMAIN_PC, "PC")
+
+    def list_objective_products(self) -> list[Product]:
+        return self._list_products(_DOMAIN_OBJECTIVE, "objectifs")

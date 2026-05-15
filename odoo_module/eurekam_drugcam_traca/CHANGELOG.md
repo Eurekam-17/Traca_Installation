@@ -5,6 +5,36 @@ Versionnement : `<odoo_major>.<minor>.<patch>` (convention Odoo).
 
 ---
 
+## [18.0.2.0.0] — 2026-05-15
+
+### Modifié
+- **6 champs Selection transformés en Many2one vers `product.template`** :
+  - `camera_a_model`, `camera_b_model`, `scene_camera_model` →
+    `Many2one('product.template')` avec domaine
+    `name =ilike "CAMERA %"` OR `name =ilike "Caméra %"`
+  - `uc_model` → `Many2one('product.template')` avec domaine
+    `name =ilike "PC %"`
+  - `camera_a_objective`, `camera_b_objective` →
+    `Many2one('product.template')` avec domaine `name =ilike "Objectif %"`
+- Avantage : enrichir le catalogue produits Drugcam dans Odoo (ajouter
+  une nouvelle référence caméra/PC/objectif) **sans toucher au code du
+  module**.
+- Cohérence avec les autres modules Odoo (achats, stocks, facturation
+  exploitent déjà `product.template`).
+
+### Compatibilité
+- Le module ne propose **pas** de migration automatique des anciennes
+  valeurs Selection. Comme aucune fiche n'avait encore de valeurs
+  remplies sur ces 6 champs côté sandbox/recette, c'est sans impact.
+- Pré-requis côté Odoo : créer les articles correspondants dans
+  `product.template` avec les bons préfixes de nom (cf. README §
+  "Pré-requis catalogue produit").
+
+### Côté logiciel `drugcam-traca` (Python/Qt)
+- Adaptation simultanée en v0.4.0 (cf. CHANGELOG global du repo).
+
+---
+
 ## [18.0.1.0.0] — 2026-05-11
 
 ### Ajouté

@@ -21,7 +21,25 @@ from .base import (
     Customer,
     OdooClientBase,
     PosteData,
+    Product,
 )
+
+
+# Produits factices pour peupler les combos en mode mock (cf. v0.4.0)
+DEFAULT_FAKE_CAMERAS = [
+    Product(odoo_id=2001, name="CAMERA ALVIUM 1800 U-158c color CH C-Mount"),
+    Product(odoo_id=2002, name="CAMERA TELI BU130 CF"),
+    Product(odoo_id=2003, name="CAMERA TELI BU160 MCF"),
+    Product(odoo_id=2004, name="Caméra ELP-USB500W05G-BL100"),
+]
+DEFAULT_FAKE_PCS = [
+    Product(odoo_id=2101, name="PC Fanless eCW470 avec bouton déporté (OLD)"),
+    Product(odoo_id=2102, name="PC Fanless eCW475 avec bouton déporté (NEW)"),
+]
+DEFAULT_FAKE_OBJECTIVES = [
+    Product(odoo_id=2201, name="Objectif KOWA LM8JC"),
+    Product(odoo_id=2202, name="Objectif KOWA LM12JC"),
+]
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +138,21 @@ class MockOdooClient(OdooClientBase):
             raise RuntimeError(
                 "MockOdooClient : authenticate() doit être appelé d'abord."
             )
+
+    # ------------------------------------------------------------------ #
+    # Catalogue produits factice (v0.4.0+)
+    # ------------------------------------------------------------------ #
+    def list_camera_products(self) -> list[Product]:
+        self._require_auth()
+        return list(DEFAULT_FAKE_CAMERAS)
+
+    def list_pc_products(self) -> list[Product]:
+        self._require_auth()
+        return list(DEFAULT_FAKE_PCS)
+
+    def list_objective_products(self) -> list[Product]:
+        self._require_auth()
+        return list(DEFAULT_FAKE_OBJECTIVES)
 
     def add_existing_poste(
         self,

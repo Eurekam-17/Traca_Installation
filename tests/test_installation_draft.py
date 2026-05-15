@@ -29,20 +29,21 @@ def _filled_draft() -> InstallationDraft:
     draft = InstallationDraft()
     draft.customer = Customer(odoo_id=101, name="CHU Lille")
     draft.system_info = _full_system_info()
-    # Toutes les valeurs sont des **valeurs techniques** (snake_case) telles
-    # qu'attendues par les Selections Odoo correspondantes.
+    # Champs Selection : valeurs techniques snake_case (data_options/*.json)
     draft.workstation_type = "iso_jce"
-    draft.modele_uc = "lian_li"
     draft.type_bloc_optique = "sortie_droite"
-    draft.type_camera_a = "alvium"
-    draft.type_camera_b = "alvium"
-    draft.objectif_a = "f8"
-    draft.objectif_b = "f8"
     draft.cable_a = "alysium"
     draft.cable_b = "alysium"
     draft.souris = "sealshield"
     draft.type_bloc_alim = "c5_120w"
     draft.type_plot_inox = "lohmann"
+    # Champs Many2one product.template (depuis v0.4.0) : ID Odoo (int)
+    draft.modele_uc_id = 2101
+    draft.type_camera_a_id = 2001
+    draft.type_camera_b_id = 2001
+    draft.objectif_a_id = 2201
+    draft.objectif_b_id = 2201
+    draft.scene_camera_model_id = 2004
     draft.serial_number = "AB000042"
     draft.optical_block_serial = "010013"
     return draft
@@ -55,15 +56,16 @@ class TestValidation:
         assert "N° de série équipement" in missing
         assert len(missing) >= 15
 
-    def test_objectifs_have_defaults(self) -> None:
-        """Defaults métier : objectif A=F8, objectif B=F12 ne sont pas manquants
-        sur un draft fraîchement créé (cas le plus fréquent chez Eurekam)."""
+    def test_objectifs_have_no_default_id(self) -> None:
+        """Depuis v0.4.0 (Many2one product), les objectifs n'ont plus de
+        default métier (impossible sans connaître les IDs Odoo). Le
+        technicien doit les saisir explicitement à chaque installation."""
         draft = InstallationDraft()
-        assert draft.objectif_a == "f8"
-        assert draft.objectif_b == "f12"
+        assert draft.objectif_a_id == 0
+        assert draft.objectif_b_id == 0
         missing = draft.required_missing()
-        assert "Objectif caméra A" not in missing
-        assert "Objectif caméra B" not in missing
+        assert "Objectif caméra A" in missing
+        assert "Objectif caméra B" in missing
 
     def test_filled_draft_is_complete(self) -> None:
         assert _filled_draft().required_missing() == []
@@ -94,7 +96,8 @@ class TestPayloadConversion:
 
     def test_to_poste_data_contains_uc_and_optical_block(self) -> None:
         poste = _filled_draft().to_poste_data()
-        assert poste.uc_model == "lian_li"
+        # uc_model est désormais un id Odoo product.template (Many2one)
+        assert poste.uc_model_id == 2101
         assert poste.pc_serial_number == "ABC1234"
         assert poste.cpu_version.startswith("Intel(R) Core(TM)")
         assert poste.optical_block_serial == "010013"
@@ -102,10 +105,10 @@ class TestPayloadConversion:
 
     def test_to_poste_data_contains_cameras(self) -> None:
         poste = _filled_draft().to_poste_data()
-        # Caméra A : type = Selection saisie, S/N = collecte sysfs (plus petit)
-        assert poste.camera_a_model == "alvium"
+        # Caméra A : modèle/objectif = Many2one product (id), S/N = collecte sysfs
+        assert poste.camera_a_model_id == 2001
         assert poste.camera_a_serial == "00050"
-        assert poste.camera_a_objective == "f8"
+        assert poste.camera_a_objective_id == 2201
         assert poste.camera_a_cable == "alysium"
         assert poste.camera_b_serial == "00100"
 

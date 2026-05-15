@@ -71,6 +71,15 @@ class Customer:
 
 
 @dataclass(frozen=True)
+class Product:
+    """Article du catalogue Odoo (product.template) — utilisé pour peupler
+    les combos Type Caméra / Type UC / Type Objectif depuis l'instance Odoo."""
+
+    odoo_id: int
+    name: str
+
+
+@dataclass(frozen=True)
 class PosteData:
     """Données pour créer ou mettre à jour une fiche ``customer.asset.workstation``.
 
@@ -103,29 +112,33 @@ class PosteData:
     installation_date: str = ""  # ISO YYYY-MM-DD            → x_installation_date
 
     # ----- UC ------------------------------------------------------------
-    uc_model: str = ""  # Selection (lian_li, ecw470, …)     → x_uc_model
-    pc_serial_number: str = ""  # libre (dmidecode)          → x_pc_serial_number
-    cpu_version: str = ""  #                                 → x_cpu_version
+    # uc_model_id : ID Odoo dans product.template (article PC). 0 = vide.
+    uc_model_id: int = 0
+    pc_serial_number: str = ""  # libre (dmidecode)
+    cpu_version: str = ""
 
     # ----- Bloc optique --------------------------------------------------
-    optical_block_serial: str = ""  # 01+4 chiffres          → x_optical_block_serial
-    optical_block_type: str = ""  # Selection                → x_optical_block_type
+    optical_block_serial: str = ""  # 01+4 chiffres
+    optical_block_type: str = ""  # Selection
 
     # ----- Caméra A ------------------------------------------------------
-    camera_a_model: str = ""  # Selection                    → x_camera_a_model
-    camera_a_serial: str = ""  # libre                       → x_camera_a_serial
-    camera_a_objective: str = ""  # Selection (f8, f12)      → x_camera_a_objective
-    camera_a_cable: str = ""  # Selection                    → x_camera_a_cable
+    # camera_a_model_id : ID Odoo dans product.template (article caméra). 0 = vide.
+    camera_a_model_id: int = 0
+    camera_a_serial: str = ""  # libre
+    # camera_a_objective_id : ID Odoo dans product.template (article objectif).
+    camera_a_objective_id: int = 0
+    camera_a_cable: str = ""  # Selection
 
     # ----- Caméra B ------------------------------------------------------
-    camera_b_model: str = ""  #                              → x_camera_b_model
-    camera_b_serial: str = ""  #                             → x_camera_b_serial
-    camera_b_objective: str = ""  #                          → x_camera_b_objective
-    camera_b_cable: str = ""  #                              → x_camera_b_cable
+    camera_b_model_id: int = 0
+    camera_b_serial: str = ""
+    camera_b_objective_id: int = 0
+    camera_b_cable: str = ""
 
     # ----- Caméra de scène ----------------------------------------------
-    scene_camera_model: str = ""  # Selection (microsoft, elp) → x_scene_camera_model
-    scene_camera_serial: str = ""  # libre                   → x_scene_camera_serial
+    # Même catégorie d'article que les caméras A/B (filtre identique côté Odoo).
+    scene_camera_model_id: int = 0
+    scene_camera_serial: str = ""  # libre
 
     # ----- Accessoires ---------------------------------------------------
     souris: str = ""  # Selection                            → x_mouse_model
@@ -190,4 +203,31 @@ class OdooClientBase(ABC):
         elle est **mise à jour** avec les nouvelles valeurs. Sinon, une
         nouvelle fiche est créée. Retourne dans tous les cas l'ID Odoo de
         la workstation.
+        """
+
+    # ------------------------------------------------------------------ #
+    # Catalogue produits (depuis v0.4.0)
+    # ------------------------------------------------------------------ #
+    @abstractmethod
+    def list_camera_products(self) -> list[Product]:
+        """Liste les articles ``product.template`` qui sont des caméras.
+
+        Filtre côté Odoo : ``name =ilike "CAMERA %" OR name =ilike "Caméra %"``.
+        Utilisé par la GUI pour peupler les 3 combos (caméra A, B, scène).
+        """
+
+    @abstractmethod
+    def list_pc_products(self) -> list[Product]:
+        """Liste les articles ``product.template`` qui sont des UC / PC.
+
+        Filtre : ``name =ilike "PC %"``.
+        Utilisé pour peupler le combo "Type UC".
+        """
+
+    @abstractmethod
+    def list_objective_products(self) -> list[Product]:
+        """Liste les articles ``product.template`` qui sont des objectifs.
+
+        Filtre : ``name =ilike "Objectif %"``.
+        Utilisé pour peupler les 2 combos "Type objectif caméra A/B".
         """
