@@ -59,8 +59,15 @@ L'application connaît deux profils prédéfinis dans
 
 | Profil | Host | DB |
 |---|---|---|
-| **staging** (défaut) | `eurekam-staging-28517368.dev.odoo.com` | `eurekam-staging-28517368` |
+| **staging** (défaut) | `eurekam-sandbox.odoo.com` | `eurekam-sandbox-32137656` |
 | **prod** | `eurekam.odoo.com` | `eurekam` |
+
+> Note : entre v0.1.4 et v0.2.3, l'instance staging était une recette
+> Odoo.sh nommée différemment (`eurekam-recette` ou
+> `eurekam-staging-28517368`). Elle a été remplacée par la sandbox
+> `eurekam-sandbox` à partir de la v0.2.4. Si tu trouves une référence
+> à l'ancien nom dans un fichier ou un script, c'est un oubli — me le
+> signaler.
 
 **3 façons de choisir l'environnement** (par ordre de priorité) :
 
@@ -75,13 +82,6 @@ L'application connaît deux profils prédéfinis dans
 
 Pour ajouter un nouveau profil (ex : pré-prod), éditer le dictionnaire
 `PROFILES` dans `src/config.py` et reconstruire l'AppImage.
-
-L'application guide ensuite le technicien sur 3 écrans :
-1. Sélection du client (filtré par étiquettes Odoo).
-2. Collecte automatique + formulaire prérempli.
-3. Récapitulatif et confirmation d'envoi.
-
-Les logs sont dans `~/.drugcam-traca/logs/traca-AAAAMMJJ.log`.
 
 ---
 
