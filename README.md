@@ -60,7 +60,7 @@ L'application connaît deux profils prédéfinis dans
 | Profil | Host | DB |
 |---|---|---|
 | **staging** (défaut) | `eurekam-sandbox.odoo.com` | `eurekam-sandbox-32137656` |
-| **prod** | `eurekam.odoo.com` | `eurekam` |
+| **prod** | `eurekam.odoo.com` | `tecliberp-eurekam-main-7835310` |
 
 > Note : entre v0.1.4 et v0.2.3, l'instance staging était une recette
 > Odoo.sh nommée différemment (`eurekam-recette` ou
