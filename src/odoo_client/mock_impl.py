@@ -40,6 +40,11 @@ DEFAULT_FAKE_OBJECTIVES = [
     Product(odoo_id=2201, name="Objectif KOWA LM8JC"),
     Product(odoo_id=2202, name="Objectif KOWA LM12JC"),
 ]
+DEFAULT_FAKE_MICE = [
+    Product(odoo_id=2301, name="Souris Silver Storm - Seal Shield"),
+    Product(odoo_id=2302, name="Souris Induction FR"),
+    Product(odoo_id=2303, name="Souris Induction GPKM-408W-WH"),
+]
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +158,10 @@ class MockOdooClient(OdooClientBase):
     def list_objective_products(self) -> list[Product]:
         self._require_auth()
         return list(DEFAULT_FAKE_OBJECTIVES)
+
+    def list_mouse_products(self) -> list[Product]:
+        self._require_auth()
+        return list(DEFAULT_FAKE_MICE)
 
     def add_existing_poste(
         self,

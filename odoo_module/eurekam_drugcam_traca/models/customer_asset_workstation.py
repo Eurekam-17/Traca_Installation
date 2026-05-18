@@ -28,6 +28,7 @@ DOMAIN_CAMERA = (
 )
 DOMAIN_PC = "[('name', '=ilike', 'PC %')]"
 DOMAIN_OBJECTIVE = "[('name', '=ilike', 'Objectif %')]"
+DOMAIN_MOUSE = "[('name', '=ilike', 'Souris %')]"
 
 
 class CustomerAssetWorkstation(models.Model):
@@ -186,15 +187,13 @@ class CustomerAssetWorkstation(models.Model):
     # ------------------------------------------------------------------ #
     # Accessoires
     # ------------------------------------------------------------------ #
-    mouse_model = fields.Selection(
-        selection=[
-            ("sealshield", "Sealshield"),
-            ("silicone", "Silicone"),
-            ("tactile", "Tactile"),
-            ("induction", "Induction"),
-        ],
+    mouse_model = fields.Many2one(
+        comodel_name="product.template",
         string="Type de souris",
+        domain=DOMAIN_MOUSE,
         tracking=True,
+        help="Référence de la souris dans le catalogue Odoo "
+             "(filtre sur préfixe 'Souris ').",
     )
     power_supply_type = fields.Selection(
         selection=[

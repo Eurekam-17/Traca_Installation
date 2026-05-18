@@ -31,7 +31,6 @@ class InstallationDraft:
     # Saisies manuelles, deux types depuis v0.4.0 :
     # - Selections classiques (valeur technique snake_case) → str
     # - Many2one product.template (Type Caméra/UC/Objectif) → int (id Odoo, 0 = vide)
-    souris: str = ""                       # Selection         → mouse_model
     workstation_type: str = ""             # Selection         → workstation_type
     type_bloc_optique: str = ""            # Selection         → optical_block_type
     type_bloc_alim: str = ""               # Selection         → power_supply_type
@@ -39,6 +38,7 @@ class InstallationDraft:
     cable_a: str = ""                      # Selection         → camera_a_cable
     cable_b: str = ""                      # Selection         → camera_b_cable
     # Many2one vers product.template (depuis v0.4.0)
+    souris_id: int = 0                     # Many2one          → mouse_model
     modele_uc_id: int = 0                  # Many2one          → uc_model
     objectif_a_id: int = 0                 # Many2one          → camera_a_objective
     objectif_b_id: int = 0                 # Many2one          → camera_b_objective
@@ -136,7 +136,7 @@ class InstallationDraft:
             "Objectif caméra B": bool(self.objectif_b_id),
             "Type câble caméra A": bool(self.cable_a),
             "Type câble caméra B": bool(self.cable_b),
-            "Type de souris": bool(self.souris),
+            "Type de souris": bool(self.souris_id),
             "Type bloc d'alimentation": bool(self.type_bloc_alim),
             "Type de plots inox": bool(self.type_plot_inox),
             "N° de série équipement": bool(self.serial_number),
@@ -192,7 +192,7 @@ class InstallationDraft:
             scene_camera_model_id=self.scene_camera_model_id,
             scene_camera_serial=self.scene_camera_serial,
             # Accessoires
-            souris=self.souris,
+            souris_id=self.souris_id,
             bloc_alim=self.type_bloc_alim,
             plots_inox=self.type_plot_inox,
             # Texte libre

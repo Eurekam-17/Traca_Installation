@@ -35,6 +35,7 @@ from .base import (
 _DOMAIN_CAMERA = ["|", ("name", "=ilike", "CAMERA %"), ("name", "=ilike", "Caméra %")]
 _DOMAIN_PC = [("name", "=ilike", "PC %")]
 _DOMAIN_OBJECTIVE = [("name", "=ilike", "Objectif %")]
+_DOMAIN_MOUSE = [("name", "=ilike", "Souris %")]
 
 logger = logging.getLogger(__name__)
 
@@ -318,8 +319,8 @@ class OdoorpcClient(OdooClientBase):
             # Caméra de scène (Many2one product.template, même filtre que cam A/B)
             "scene_camera_model": data.scene_camera_model_id or False,
             "scene_camera_serial": data.scene_camera_serial,
-            # Accessoires
-            "mouse_model": data.souris or False,
+            # Accessoires (mouse_model = Many2one product.template depuis v0.5.0)
+            "mouse_model": data.souris_id or False,
             "power_supply_type": data.bloc_alim or False,
             "inox_plot_type": data.plots_inox or False,
             # Commentaires libres
@@ -347,3 +348,6 @@ class OdoorpcClient(OdooClientBase):
 
     def list_objective_products(self) -> list[Product]:
         return self._list_products(_DOMAIN_OBJECTIVE, "objectifs")
+
+    def list_mouse_products(self) -> list[Product]:
+        return self._list_products(_DOMAIN_MOUSE, "souris")

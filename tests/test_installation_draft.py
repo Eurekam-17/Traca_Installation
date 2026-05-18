@@ -34,7 +34,7 @@ def _filled_draft() -> InstallationDraft:
     draft.type_bloc_optique = "sortie_droite"
     draft.cable_a = "alysium"
     draft.cable_b = "alysium"
-    draft.souris = "sealshield"
+    draft.souris_id = 2301
     draft.type_bloc_alim = "c5_120w"
     draft.type_plot_inox = "lohmann"
     # Champs Many2one product.template (depuis v0.4.0) : ID Odoo (int)
@@ -114,7 +114,8 @@ class TestPayloadConversion:
 
     def test_to_poste_data_contains_accessories(self) -> None:
         poste = _filled_draft().to_poste_data()
-        assert poste.souris == "sealshield"
+        # souris est désormais un id Odoo product.template (Many2one)
+        assert poste.souris_id == 2301
         assert poste.bloc_alim == "c5_120w"
         assert poste.plots_inox == "lohmann"
 

@@ -141,7 +141,8 @@ class PosteData:
     scene_camera_serial: str = ""  # libre
 
     # ----- Accessoires ---------------------------------------------------
-    souris: str = ""  # Selection                            → x_mouse_model
+    # souris_id : Many2one product.template (article souris). 0 = vide.
+    souris_id: int = 0  #                                    → mouse_model
     bloc_alim: str = ""  # Selection                         → x_power_supply_type
     plots_inox: str = ""  # Selection (lohmann, _3m)         → x_inox_plot_type
 
@@ -230,4 +231,12 @@ class OdooClientBase(ABC):
 
         Filtre : ``name =ilike "Objectif %"``.
         Utilisé pour peupler les 2 combos "Type objectif caméra A/B".
+        """
+
+    @abstractmethod
+    def list_mouse_products(self) -> list[Product]:
+        """Liste les articles ``product.template`` qui sont des souris.
+
+        Filtre : ``name =ilike "Souris %"`` (exclut "Tapis de souris").
+        Utilisé pour peupler le combo "Type de souris".
         """

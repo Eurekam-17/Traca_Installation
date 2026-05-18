@@ -50,7 +50,7 @@ def _full_poste(serial: str = "AB000042", block: str = "010013") -> PosteData:
         scene_camera_model_id=2004,
         scene_camera_serial="SC-001",
         # Accessoires
-        souris="sealshield",
+        souris_id=2301,
         bloc_alim="c5_120w",
         plots_inox="lohmann",
         # Texte libre
@@ -146,6 +146,11 @@ class TestProductCatalog:
         objs = authenticated_client.list_objective_products()
         assert len(objs) >= 2
         assert all(o.name.startswith("Objectif ") for o in objs)
+
+    def test_list_mouse_products_returns_mice(self, authenticated_client) -> None:
+        mice = authenticated_client.list_mouse_products()
+        assert len(mice) >= 3
+        assert all(m.name.startswith("Souris ") for m in mice)
 
     def test_catalog_methods_require_authentication(self) -> None:
         client = MockOdooClient()

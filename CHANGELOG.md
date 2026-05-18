@@ -12,6 +12,37 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.5.0] — 2026-05-15
+
+> Suite de la v0.4.0 : le **7ᵉ et dernier champ référencé** dans le
+> catalogue Odoo passe de Selection à Many2one — le **type de souris**.
+
+### Côté module Odoo `eurekam_drugcam_traca` (bump → 18.0.3.0.0)
+- `mouse_model` : `Selection` → `Many2one('product.template')`
+  - Domaine : `name =ilike "Souris %"` (exclut "Tapis de souris" qui ne
+    commence pas par "Souris").
+- Tracking conservé.
+
+### Côté logiciel `drugcam-traca` (Python/Qt, bump → 0.5.0)
+- `PosteData.souris` → `PosteData.souris_id: int`
+- `InstallationDraft.souris` → `InstallationDraft.souris_id: int`
+- Nouvelle méthode `OdooClientBase.list_mouse_products()` + impls réelle/mock
+- GUI step 2 : la souris passe de la section "Choix matériel" (Selection)
+  à la section "Articles catalogue Odoo" (combo dynamique)
+- Suppression de `src/data_options/souris.json`
+- 44 tests pytest passent (+ `test_list_mouse_products_returns_mice`)
+
+### Bilan des champs référencés catalogue Odoo (Many2one product.template)
+Au total **7 champs** sont désormais des Many2one vers `product.template` :
+`uc_model`, `camera_a_model`, `camera_b_model`, `scene_camera_model`,
+`camera_a_objective`, `camera_b_objective`, **`mouse_model`** (nouveau).
+
+Restent en Selection (valeurs métier fixes, pas d'article Odoo) :
+`workstation_type`, `optical_block_type`, `camera_a_cable`,
+`camera_b_cable`, `power_supply_type`, `inox_plot_type`.
+
+---
+
 ## [0.4.0] — 2026-05-15
 
 > **Évolution structurelle** : 6 champs (Type Caméra A/B/scène, Type UC,
@@ -479,6 +510,7 @@ logiciel principal continue de fonctionner exactement comme en 0.2.2.
 
 ---
 
+[0.5.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.5.0
 [0.4.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.3.0
 [0.2.3]: https://github.com/Eurekam-17/Traca_Installation/releases/tag/v0.2.3

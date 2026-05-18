@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drugcam-traca"
-version = "0.4.0"
+version = "0.5.0"
 description = "Outil de traçabilité des installations Drugcam (Eurekam)"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -5,6 +5,18 @@ Versionnement : `<odoo_major>.<minor>.<patch>` (convention Odoo).
 
 ---
 
+## [18.0.3.0.0] — 2026-05-15
+
+### Modifié
+- **`mouse_model`** : `Selection` → `Many2one('product.template')`.
+  - Domaine : `name =ilike "Souris %"`.
+  - Exclut "Tapis de souris" / "Tapis de souris avec logo" (ne commencent
+    pas par "Souris ").
+- Tracking conservé. Désormais **7 champs Many2one** product.template au
+  total (les 6 de v18.0.2.0.0 + mouse_model).
+
+---
+
 ## [18.0.2.0.0] — 2026-05-15
 
 ### Modifié

@@ -107,7 +107,6 @@ class FormStep(BaseStep):
         "type_bloc_optique.json": "type_bloc_optique",
         "cable_a.json": "cable_a",
         "cable_b.json": "cable_b",
-        "souris.json": "souris",
         "type_bloc_alimentation.json": "type_bloc_alim",
         "type_plot_inox.json": "type_plot_inox",
     }
@@ -117,7 +116,6 @@ class FormStep(BaseStep):
         "type_bloc_optique": "Type de bloc optique",
         "cable_a": "Type câble caméra A",
         "cable_b": "Type câble caméra B",
-        "souris": "Type de souris",
         "type_bloc_alim": "Bloc d'alimentation",
         "type_plot_inox": "Plots inox",
     }
@@ -130,6 +128,7 @@ class FormStep(BaseStep):
     # ───────────────────────────────────────────────────────────────────
     PRODUCT_FIELDS: list[tuple[str, str, str]] = [
         # (attr du draft, libellé, nom de méthode sur le client Odoo)
+        ("souris_id", "Type de souris", "list_mouse_products"),
         ("modele_uc_id", "Type UC", "list_pc_products"),
         ("type_camera_a_id", "Type caméra A", "list_camera_products"),
         ("objectif_a_id", "Objectif caméra A", "list_objective_products"),
