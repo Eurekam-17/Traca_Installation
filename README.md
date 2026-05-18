@@ -21,7 +21,7 @@ chez un client, et envoie les données dans Odoo.
 4. [Développement](#4--développement)
 5. [Mode mock (sans Odoo réel)](#5--mode-mock-sans-odoo-réel)
 6. [Construire l'AppImage](#6--construire-lappimage)
-7. [Maintenance des fichiers data_options](#7--maintenance-des-fichiers-data_options)
+7. [Maintenance des listes déroulantes](#7--maintenance-des-listes-déroulantes)
 8. [Limitations connues du prototype](#8--limitations-connues-du-prototype)
 
 ---
@@ -117,7 +117,7 @@ src/
 │   ├── step2_form.py           # Étape 2 : collecte + formulaire prérempli
 │   └── step3_summary.py        # Étape 3 : récap + envoi Odoo
 │
-└── data_options/           # JSON éditables (cf. § 6)
+└── data_options/           # 6 JSON éditables (Selections locales, cf. § 7)
 
 tests/                      # pytest, aucun appel réseau
 scripts/get_camera.sh       # Référence bash de la détection caméras
@@ -133,8 +133,9 @@ build_appimage.sh           # Construction de l'AppImage
   est la **caméra A**, la plus grande est la **B**.
 - **§ 7** : les numéros de série sont préremplis avec `MAX(existant) + 1`,
   mais restent éditables dans la GUI.
-- **§ 9** : les fichiers `data_options/*.json` peuvent être édités sans
-  recompilation (cf. § 6 de ce README).
+- **§ 9** : les 6 fichiers `data_options/*.json` (Selections locales)
+  peuvent être édités sans recompilation. Les 7 champs « catalogue »
+  (Type UC/Caméra/Objectif/Souris) viennent d'Odoo. Cf. § 7 de ce README.
 
 ---
 
@@ -224,36 +225,66 @@ Checklist post-build (cf. CLAUDE.md § 12) :
 
 ---
 
-## 7 — Maintenance des fichiers `data_options`
+## 7 — Maintenance des listes déroulantes
 
-Les 8 fichiers `src/data_options/*.json` listent les options des menus
-déroulants. **Pour ajouter ou retirer une option, pas besoin de recompiler.**
+Depuis la v0.5.0, les listes déroulantes du formulaire (étape 2) ont
+**deux origines distinctes** :
 
-### Format
+### 7.1 — Combos « catalogue Odoo » (7 champs) — PAS de JSON
+
+Les champs **Type UC, Type caméra A/B, Type caméra de scène, Type
+objectif A/B, Type de souris** sont des `Many2one` vers
+`product.template`. Leurs options sont **chargées dynamiquement depuis
+Odoo** au lancement du formulaire — il n'y a aucun fichier JSON pour eux.
+
+**Pour ajouter une option** (ex. une nouvelle référence caméra) :
+créer simplement l'article dans le catalogue Odoo en respectant la
+convention de nom (préfixe `PC `, `CAMERA `/`Caméra `, `Objectif `,
+`Souris `). Aucune action côté logiciel — l'article apparaîtra
+automatiquement au prochain lancement. Détails :
+[`odoo_module/eurekam_drugcam_traca/README.md`](odoo_module/eurekam_drugcam_traca/README.md).
+
+### 7.2 — Combos « Selection locale » (6 fichiers JSON)
+
+Les **6 fichiers** `src/data_options/*.json` couvrent les champs à
+valeurs métier fixes (pas d'article Odoo) :
+
+| Fichier | Champ |
+|---|---|
+| `workstation_type.json` | Type d'enceinte / hotte |
+| `type_bloc_optique.json` | Type de bloc optique |
+| `cable_a.json` / `cable_b.json` | Type de câble caméra A / B |
+| `type_bloc_alimentation.json` | Bloc d'alimentation |
+| `type_plot_inox.json` | Plots inox |
+
+**Pour ajouter ou retirer une option, pas besoin de recompiler.**
+
+#### Format
 
 ```json
 {
-  "label": "Modèle de souris",
+  "label": "Type de bloc optique",
   "options": [
-    { "display": "Logitech M185", "value": "logitech_m185" },
-    { "display": "Microsoft Basic Optical", "value": "ms_basic_optical" }
+    { "display": "Sortie droite", "value": "sortie_droite" },
+    { "display": "Sortie latérale", "value": "sortie_laterale" }
   ]
 }
 ```
 
 - `display` : ce que voit le technicien.
-- `value` : ce qui est envoyé à Odoo (laisser identique au display si pas de
-  raison de différencier).
+- `value` : la **valeur technique** envoyée à Odoo — doit correspondre
+  exactement à la valeur de la Selection côté module Odoo
+  (cf. `models/customer_asset_workstation.py`).
 
-### Surcharger les options sans toucher à l'AppImage
+#### Surcharger les options sans toucher à l'AppImage
 
 Copier le fichier modifié dans `~/.drugcam-traca/data_options/` — il sera
 chargé en priorité au prochain lancement.
 
-### Si un fichier JSON est invalide ou manquant
+#### Si un fichier JSON est invalide ou manquant
 
-L'application affiche un avertissement et bascule le champ correspondant en
-**saisie libre** au lieu de planter (cf. CLAUDE.md § 9).
+L'application affiche un avertissement et bascule le champ correspondant
+en **saisie libre** au lieu de planter (cf. CLAUDE.md § 9).
 
 ---
 

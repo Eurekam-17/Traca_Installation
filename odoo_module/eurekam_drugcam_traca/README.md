@@ -29,24 +29,26 @@ Tous avec `tracking=True` (audit Odoo natif dans le chatter).
 | Caméra B | idem caméra A | |
 | Caméra de scène | `scene_camera_serial` (Char) | |
 | Caméra de scène | **`scene_camera_model`** | **Many2one → product.template** |
-| Accessoires | `mouse_model`, `power_supply_type`, `inox_plot_type` | Selection |
+| Accessoires | `power_supply_type`, `inox_plot_type` | Selection |
+| Accessoires | **`mouse_model`** | **Many2one → product.template** |
 | Texte libre | `comments` | Text |
 
 Détail des Selections (libellés et valeurs techniques) et des domaines
 Many2one : voir [`models/customer_asset_workstation.py`](models/customer_asset_workstation.py).
 
-## Pré-requis catalogue produit (depuis v18.0.2.0.0)
+## Pré-requis catalogue produit (depuis v18.0.2.0.0, étendu en v18.0.3.0.0)
 
-Les **6 champs Many2one** (Type Caméra A/B/scène, Type UC, Type objectif A/B)
-récupèrent leurs options depuis **`product.template`**. Pour qu'ils
-fonctionnent, des articles doivent exister dans Odoo avec les **conventions
-de nommage Eurekam** :
+Les **7 champs Many2one** (Type Caméra A/B/scène, Type UC, Type objectif
+A/B, Type de souris) récupèrent leurs options depuis **`product.template`**.
+Pour qu'ils fonctionnent, des articles doivent exister dans Odoo avec les
+**conventions de nommage Eurekam** :
 
 | Catégorie | Convention de préfixe (insensible à la casse via `=ilike`) |
 |---|---|
 | Caméra (A, B, scène) | `CAMERA ` ou `Caméra ` (avec espace) |
 | UC / PC | `PC ` (avec espace) |
 | Objectif | `Objectif ` (avec espace) |
+| Souris | `Souris ` (avec espace — exclut « Tapis de souris ») |
 
 Tous les articles sont dans la catégorie unique `Tous / Achat / Drugcam`.
 La distinction se fait uniquement par le préfixe du nom.
