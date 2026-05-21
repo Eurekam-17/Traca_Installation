@@ -6,7 +6,7 @@ ou via le script Python `setup_drugcam_extensions.py`).
 
 À partir de la **v0.3.0** du projet, cette approche est **remplacée**
 par un vrai module Odoo : voir
-[`odoo_module/eurekam_drugcam_traca/`](../../../odoo_module/eurekam_drugcam_traca/).
+[`eurekam_drugcam_traca/`](../../../eurekam_drugcam_traca/).
 
 ## Pourquoi c'est archivé
 

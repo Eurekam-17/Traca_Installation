@@ -105,7 +105,7 @@ Restent en Selection (valeurs métier fixes, pas d'article Odoo) :
 > recommandation du prestataire pour la stabilité long-terme.
 
 ### Ajouté
-- **Nouveau module Odoo** [`odoo_module/eurekam_drugcam_traca/`](odoo_module/eurekam_drugcam_traca/) :
+- **Nouveau module Odoo** [`eurekam_drugcam_traca/`](eurekam_drugcam_traca/) :
   - `__manifest__.py` (Odoo 18, dépend de `s6r_eurekam_customer_assets`)
   - `models/customer_asset_workstation.py` : 22 champs métier en Python avec `tracking=True`
   - `views/customer_asset_workstation_views.xml` : 2 héritages (form + list)
@@ -140,7 +140,7 @@ Restent en Selection (valeurs métier fixes, pas d'article Odoo) :
 - Fichiers `data_options/*.json` (les valeurs Selection sont identiques).
 
 ### Procédure de mise en route post-v0.3.0
-1. Faire installer le module `odoo_module/eurekam_drugcam_traca/` sur
+1. Faire installer le module `eurekam_drugcam_traca/` sur
    l'instance sandbox Odoo.sh (côté Loïc, Scalizer ou autre prestataire).
 2. Le module crée automatiquement les 22 champs + 5 vues lors de l'install.
 3. Lancer le logiciel `drugcam-traca` sur sandbox → tester un envoi.

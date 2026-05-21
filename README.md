@@ -7,7 +7,7 @@ chez un client, et envoie les données dans Odoo.
 > Spécifications complètes dans [`CLAUDE.md`](CLAUDE.md).
 > Historique des versions dans [`CHANGELOG.md`](CHANGELOG.md).
 > Import en masse via Excel/CSV : voir [`docs/odoo_import/`](docs/odoo_import/).
-> Module Odoo associé (depuis v0.3.0) : [`odoo_module/eurekam_drugcam_traca/`](odoo_module/eurekam_drugcam_traca/).
+> Module Odoo associé (depuis v0.3.0) : [`eurekam_drugcam_traca/`](eurekam_drugcam_traca/).
 > Doc Odoo (incl. legacy Studio archivé) : [`docs/odoo_admin/`](docs/odoo_admin/).
 > Cible : **Rocky Linux 9 + KDE Plasma**, livraison **AppImage**.
 
@@ -242,7 +242,7 @@ créer simplement l'article dans le catalogue Odoo en respectant la
 convention de nom (préfixe `PC `, `CAMERA `/`Caméra `, `Objectif `,
 `Souris `). Aucune action côté logiciel — l'article apparaîtra
 automatiquement au prochain lancement. Détails :
-[`odoo_module/eurekam_drugcam_traca/README.md`](odoo_module/eurekam_drugcam_traca/README.md).
+[`eurekam_drugcam_traca/README.md`](eurekam_drugcam_traca/README.md).
 
 ### 7.2 — Combos « Selection locale » (6 fichiers JSON)
 

@@ -2,14 +2,14 @@
 
 À partir de la **v0.3.0** du projet, les extensions Odoo nécessaires au
 logiciel Drugcam Traca sont implémentées sous forme de **vrai module
-Odoo** : [`odoo_module/eurekam_drugcam_traca/`](../../odoo_module/eurekam_drugcam_traca/).
+Odoo** : [`eurekam_drugcam_traca/`](../../eurekam_drugcam_traca/).
 
 → **C'est là que tout se passe désormais.** Le module contient :
 - Les 22 champs métier en Python (Selections + Char + Date + Text)
 - Les 5 vues d'héritage en XML
 - Les tests unitaires
 - Le manifest avec sa dépendance vers `s6r_eurekam_customer_assets`
-- Sa propre documentation : [`odoo_module/eurekam_drugcam_traca/README.md`](../../odoo_module/eurekam_drugcam_traca/README.md)
+- Sa propre documentation : [`eurekam_drugcam_traca/README.md`](../../eurekam_drugcam_traca/README.md)
 
 ## Historique
 
