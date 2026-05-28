@@ -159,6 +159,7 @@ class FormStep(BaseStep):
         self._manual_combos: dict[str, QComboBox] = {}
         # Combos pour les Many2one product.template (clé = attr du draft)
         self._product_combos: dict[str, QComboBox] = {}
+        self._products_loaded: bool = False  # chargés à la 1ère entrée dans l'étape
         self._free_text_inputs: dict[str, QLineEdit | QTextEdit] = {}
         self._serial_eq_input: QLineEdit | None = None
         self._serial_block_input: QLineEdit | None = None
@@ -223,9 +224,11 @@ class FormStep(BaseStep):
             ("os_pretty_name", "Version OS"),
             ("assist_version", "Version Assist"),
             ("mac_addresses", "Adresses MAC enp*"),
-            ("camera_a_model", "Caméra A — modèle"),
+            # Les modèles caméra (camera_a_model / camera_b_model) ne sont plus
+            # affichés ici depuis v0.4.0 : ils sont des Many2one product.template
+            # dans Odoo. Le modèle brut détecté est affiché en tooltip sur les
+            # combos "Type caméra A/B" dans la section Articles catalogue Odoo.
             ("camera_a_serial", "Caméra A — S/N"),
-            ("camera_b_model", "Caméra B — modèle"),
             ("camera_b_serial", "Caméra B — S/N"),
         ):
             row, line_edit = self._build_auto_row(attr)
@@ -272,51 +275,17 @@ class FormStep(BaseStep):
         layout.addWidget(manual_box)
 
         # — Section Articles Odoo (Many2one product.template) ─────────────
-        # Les listes sont peuplées dynamiquement depuis le catalogue Odoo
-        # (cf. méthodes list_*_products de OdooClientBase). Si Odoo est
-        # injoignable, les combos restent vides et l'utilisateur ne peut
-        # pas valider — un message d'aide indique de vérifier la connexion.
+        # Les combos sont créés vides ici ; ils sont peuplés depuis Odoo
+        # dans _load_products(), appelé au premier on_entered() — une fois
+        # l'authentification Odoo terminée.
         product_box = QGroupBox("Articles catalogue Odoo (* = obligatoire)")
         product_form = QFormLayout(product_box)
         product_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
 
-        # Cache des listes de produits par méthode (évite plusieurs appels
-        # API si plusieurs combos partagent la même source — ex. les 3 combos
-        # caméra A/B/scène appellent tous list_camera_products).
-        product_cache: dict[str, list] = {}
-
-        for attr, label, method_name in self.PRODUCT_FIELDS:
+        for attr, label, _method in self.PRODUCT_FIELDS:
             combo = QComboBox()
-            combo.addItem("— Sélectionner —", userData=0)
-            try:
-                if method_name not in product_cache:
-                    product_cache[method_name] = getattr(self._client, method_name)()
-                products = product_cache[method_name]
-                if not products:
-                    logger.warning(
-                        "Aucun produit retourné par %s — combo %s sera vide.",
-                        method_name, attr,
-                    )
-                    combo.setEnabled(False)
-                    combo.setToolTip(
-                        "Aucun article correspondant trouvé dans le catalogue Odoo. "
-                        "Vérifier que des produits avec le bon préfixe de nom existent."
-                    )
-                else:
-                    for p in products:
-                        combo.addItem(p.name, userData=p.odoo_id)
-            except Exception as exc:  # noqa: BLE001
-                logger.error("Chargement %s en échec : %s", method_name, exc)
-                combo.setEnabled(False)
-                combo.setToolTip(f"Erreur de chargement Odoo : {exc}")
-
-            # Présélection si l'attribut du draft contient déjà un id
-            current_id = getattr(self._draft, attr, 0)
-            if current_id:
-                idx = combo.findData(current_id)
-                if idx >= 0:
-                    combo.setCurrentIndex(idx)
-
+            combo.addItem("— Chargement en cours… —", userData=0)
+            combo.setEnabled(False)
             combo.currentIndexChanged.connect(self._on_field_changed)
             self._product_combos[attr] = combo
             product_form.addRow(label + " *", combo)
@@ -378,6 +347,10 @@ class FormStep(BaseStep):
     # Cycle de vie
     # ------------------------------------------------------------------ #
     def on_entered(self) -> None:
+        # Charger les produits Odoo la première fois (client authentifié à ce stade)
+        if not self._products_loaded:
+            self._load_products()
+
         # Si on revient depuis l'étape 3, on ne relance pas la collecte
         if self._draft.system_info is None:
             self._stack.setCurrentIndex(0)
@@ -385,6 +358,59 @@ class FormStep(BaseStep):
         else:
             self._stack.setCurrentIndex(1)
             self._refresh_validation()
+
+    def _load_products(self) -> None:
+        """Charge les listes de produits depuis Odoo et peuple les combos Many2one.
+
+        Appelé une seule fois depuis on_entered(), après que la connexion Odoo
+        soit établie (authenticate() est terminé avant d'afficher les étapes).
+        Utilise un cache par méthode pour éviter plusieurs appels API quand des
+        combos partagent la même source (ex. les 3 combos caméra partagent
+        list_camera_products).
+        """
+        product_cache: dict[str, list] = {}
+
+        for attr, label, method_name in self.PRODUCT_FIELDS:
+            combo = self._product_combos.get(attr)
+            if combo is None:
+                continue
+            combo.clear()
+            combo.addItem("— Sélectionner —", userData=0)
+
+            try:
+                if method_name not in product_cache:
+                    product_cache[method_name] = getattr(self._client, method_name)()
+                products = product_cache[method_name]
+
+                if not products:
+                    logger.warning(
+                        "Aucun produit retourné par %s — combo %s sera vide.",
+                        method_name, attr,
+                    )
+                    combo.setEnabled(False)
+                    combo.setToolTip(
+                        "Aucun article correspondant dans le catalogue Odoo. "
+                        "Créer des produits avec le bon préfixe (CAMERA / PC / "
+                        "Objectif / Souris) dans Odoo → Achats → Drugcam."
+                    )
+                else:
+                    for p in products:
+                        combo.addItem(p.name, userData=p.odoo_id)
+                    combo.setEnabled(True)
+
+            except Exception as exc:  # noqa: BLE001
+                logger.error("Chargement produits %s en échec : %s", method_name, exc)
+                combo.setEnabled(False)
+                combo.setToolTip(f"Erreur de chargement depuis Odoo : {exc}")
+
+            # Présélection si le draft contient déjà un id (retour depuis étape 3)
+            current_id = getattr(self._draft, attr, 0)
+            if current_id:
+                idx = combo.findData(current_id)
+                if idx >= 0:
+                    combo.setCurrentIndex(idx)
+
+        self._products_loaded = True
 
     def _start_collection(self) -> None:
         self._worker = _CollectionWorker(self._client, self)
@@ -456,13 +482,26 @@ class FormStep(BaseStep):
             "mac_addresses": info.mac_addresses or "",
         }
         if info.camera_pair:
-            mapping["camera_a_model"] = info.camera_pair.camera_a.product
             mapping["camera_a_serial"] = info.camera_pair.camera_a.serial
-            mapping["camera_b_model"] = info.camera_pair.camera_b.product
             mapping["camera_b_serial"] = info.camera_pair.camera_b.serial
+            # Le modèle brut détecté (ex. "Allied Vision Alvium 1800 U-319c")
+            # est affiché en tooltip sur les combos Many2one pour aider
+            # le technicien à choisir le bon produit dans le catalogue Odoo.
+            for combo_attr, detected in (
+                ("type_camera_a_id", info.camera_pair.camera_a.product),
+                ("type_camera_b_id", info.camera_pair.camera_b.product),
+            ):
+                combo = self._product_combos.get(combo_attr)
+                if combo and detected:
+                    existing = combo.toolTip()
+                    prefix = f"Modèle détecté : {detected}"
+                    if existing and "Modèle détecté" not in existing:
+                        combo.setToolTip(f"{prefix}\n{existing}")
+                    else:
+                        combo.setToolTip(prefix)
         else:
-            mapping["camera_a_model"] = mapping["camera_a_serial"] = ""
-            mapping["camera_b_model"] = mapping["camera_b_serial"] = ""
+            mapping["camera_a_serial"] = ""
+            mapping["camera_b_serial"] = ""
 
         for attr, value in mapping.items():
             widget = self._auto_field_widgets.get(attr)
