@@ -178,26 +178,42 @@ class OdoorpcClient(OdooClientBase):
     # ------------------------------------------------------------------ #
     # Numérotation — lecture directe sur customer.asset.workstation
     # ------------------------------------------------------------------ #
-    def _existing_workstation_field_values(self, field_name: str) -> list[str]:
-        """Liste toutes les valeurs d'un champ texte sur customer.asset.workstation."""
+    def _max_workstation_serial(self, field_name: str) -> str:
+        """Retourne la valeur MAX d'un champ texte sur customer.asset.workstation.
+
+        Tri alphabétique descendant avec limit=1 : fonctionne correctement
+        pour les formats AB000001 et 010001 car ils sont zéro-paddés à largeur
+        fixe, donc l'ordre alphabétique == l'ordre numérique.
+
+        Retourne une chaîne vide si le champ est absent (module pas installé)
+        ou si aucun enregistrement ne le remplit — le calcul MAX+1 retournera
+        alors le premier numéro de la série (ex. AB000001).
+        """
         try:
             model = self._client.env[config.ODOO_MODEL_POSTE]
-            records = model.search_read([], [field_name])
+            records = model.search_read(
+                [(field_name, "!=", False)],
+                [field_name],
+                order=f"{field_name} desc",
+                limit=1,
+            )
         except odoorpc.error.RPCError as exc:
             logger.warning(
-                "Lecture %s.%s impossible : %s",
+                "Lecture MAX de %s.%s impossible (champ absent ?) : %s",
                 config.ODOO_MODEL_POSTE, field_name, exc,
             )
-            return []
-        return [r.get(field_name) or "" for r in records]
+            return ""
+        if not records:
+            return ""
+        return records[0].get(field_name) or ""
 
     def next_tracability_serial(self) -> str:
-        existing = self._existing_workstation_field_values("workstation_serial_number")
-        return numbering.next_tracability_serial(existing)
+        max_val = self._max_workstation_serial("workstation_serial_number")
+        return numbering.next_tracability_serial([max_val] if max_val else [])
 
     def next_optical_block_serial(self) -> str:
-        existing = self._existing_workstation_field_values("optical_block_serial")
-        return numbering.next_optical_block_serial(existing)
+        max_val = self._max_workstation_serial("optical_block_serial")
+        return numbering.next_optical_block_serial([max_val] if max_val else [])
 
     # ------------------------------------------------------------------ #
     # Helpers de résolution Many2one
