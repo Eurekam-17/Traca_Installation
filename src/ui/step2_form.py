@@ -257,9 +257,8 @@ class FormStep(BaseStep):
                 )
 
             # Présélection de la valeur déjà présente dans le draft.
-            # Cela permet aux defaults métier d'InstallationDraft (par ex.
-            # objectif_a='f8', objectif_b='f12') d'être visibles d'emblée
-            # dans les combos. Le technicien peut toujours changer.
+            # Utile si le draft a été partiellement rempli (retour en arrière).
+            # Le technicien peut toujours changer.
             current_value = getattr(self._draft, attr, "")
             if current_value:
                 idx = combo.findData(current_value)
