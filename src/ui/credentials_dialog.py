@@ -29,18 +29,44 @@ class CredentialsDialog(QDialog):
     automatiquement.
     """
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        parent: QWidget | None = None,
+        existing: config.OdooCredentials | None = None,
+    ) -> None:
+        """Construit le dialogue.
+
+        Args:
+            existing: credentials actuels à pré-remplir. Si fournis, le
+                dialogue passe en mode « reconfiguration » (modification du
+                login / de la clé après installation) plutôt que première
+                saisie.
+        """
         super().__init__(parent)
-        self.setWindowTitle("Configuration Odoo — première utilisation")
+        self._existing = existing
+        if existing is None:
+            self.setWindowTitle("Configuration Odoo — première utilisation")
+        else:
+            self.setWindowTitle("Configuration Odoo — modifier la connexion")
         self.setMinimumWidth(560)
 
         layout = QVBoxLayout(self)
 
+        if existing is None:
+            intro_text = (
+                "Aucune clé API n'a été trouvée pour ce profil. Choisissez "
+                "l'environnement Odoo et saisissez la clé API du compte de "
+                "service (généralement <b>traca-bot@eurekam.fr</b>).<br><br>"
+            )
+        else:
+            intro_text = (
+                "Modifiez le login et/ou la clé API du compte de service "
+                "Odoo. La clé actuelle est pré-remplie — laissez-la telle "
+                "quelle pour ne changer que le login ou l'environnement.<br><br>"
+            )
         intro = QLabel(
-            "Aucune clé API n'a été trouvée pour ce profil. Choisissez "
-            "l'environnement Odoo et saisissez la clé API du compte de "
-            "service (généralement <b>traca-bot@eurekam.fr</b>).<br><br>"
-            "Les informations seront sauvegardées dans "
+            intro_text
+            + "Les informations seront sauvegardées dans "
             "<code>~/.drugcam-traca/credentials.&lt;profil&gt;.json</code> "
             "(permissions 600). Un fichier distinct est utilisé pour chaque "
             "environnement."
@@ -89,6 +115,13 @@ class CredentialsDialog(QDialog):
 
         # Met à jour l'avertissement initial selon le profil actif
         self._on_env_changed()
+
+        # Mode reconfiguration : pré-remplit les valeurs actuelles. À faire
+        # APRÈS _on_env_changed() qui réinitialise login/host/db depuis le
+        # profil actif (sinon les valeurs existantes seraient écrasées).
+        if existing is not None:
+            self._login.setText(existing.login)
+            self._api_key.setText(existing.api_key)
 
     def _on_env_changed(self, *_args: object) -> None:
         """Quand on change de profil, met à jour les champs et l'avertissement."""

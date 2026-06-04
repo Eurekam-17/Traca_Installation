@@ -308,5 +308,7 @@ Cf. CLAUDE.md § 15.
 - Plan Odoo confirmé en **Custom** (sinon API externe inaccessible).
 - Modèle Odoo `Traçabilité` créé (variable d'env `DRUGCAM_TRACA_MODEL_TRACABILITE`).
 - Noms techniques exacts des champs `Postes clients` et `Traçabilité` validés.
-- Étiquettes `res.partner.category` "Projet en cours" et "Clients en Prod"
-  vérifiées (variables `CUSTOMER_CATEGORY_*` dans `src/config.py`).
+- Étiquettes `res.partner.category` `1- NEW`, `EN PROD` et `DISTRIBUTEUR`
+  vérifiées (liste `CUSTOMER_CATEGORIES` dans `src/config.py`). Les
+  distributeurs sont inclus car ils peuvent eux aussi nous passer des
+  commandes et donc avoir des postes rattachés.

@@ -90,17 +90,17 @@ class OdoorpcClient(OdooClientBase):
     # Clients
     # ------------------------------------------------------------------ #
     def _get_filter_category_ids(self) -> list[int]:
-        """Résout les IDs des étiquettes ``1- NEW`` et ``EN PROD``. Caché."""
+        """Résout les IDs des étiquettes clients à filtrer (cf. config.CUSTOMER_CATEGORIES).
+
+        Inclut ``1- NEW``, ``EN PROD`` et ``DISTRIBUTEUR``. Résultat caché.
+        """
         if self._partner_category_ids is not None:
             return self._partner_category_ids
 
         try:
             category_model = self._client.env[config.ODOO_MODEL_PARTNER_CATEGORY]
             ids = category_model.search([
-                ("name", "in", [
-                    config.CUSTOMER_CATEGORY_PROJET,
-                    config.CUSTOMER_CATEGORY_PROD,
-                ]),
+                ("name", "in", list(config.CUSTOMER_CATEGORIES)),
             ])
         except odoorpc.error.RPCError as exc:
             raise OdooConnectionError(
@@ -109,8 +109,8 @@ class OdoorpcClient(OdooClientBase):
 
         if not ids:
             logger.warning(
-                "Aucune étiquette correspondant à %r ou %r — la liste sera vide.",
-                config.CUSTOMER_CATEGORY_PROJET, config.CUSTOMER_CATEGORY_PROD,
+                "Aucune étiquette correspondant à %r — la liste sera vide.",
+                config.CUSTOMER_CATEGORIES,
             )
 
         self._partner_category_ids = list(ids)

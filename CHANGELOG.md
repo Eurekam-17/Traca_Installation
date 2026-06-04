@@ -12,6 +12,28 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.6.0] — 2026-06-04
+
+> Reconfiguration de la connexion Odoo sans redémarrage, et prise en compte
+> des clients **distributeurs**.
+
+### Côté logiciel `drugcam-traca` (Python/Qt, bump → 0.6.0)
+- **Menu « Configuration → Configuration Odoo (login / clé API)… »** dans la
+  fenêtre principale : permet de modifier le login et la clé API du compte de
+  service après installation, sans éditer le JSON à la main ni redémarrer
+  l'AppImage. Reconstruit le client, rafraîchit le bandeau/titre et relance le
+  test de connexion. Affiche un message d'info en mode mock.
+  - `CredentialsDialog` accepte un paramètre `existing` : pré-remplit login +
+    clé en mode reconfiguration.
+- **Clients distributeurs** : ajout de l'étiquette `DISTRIBUTEUR` au filtre de
+  la liste des clients (étape 2). Les distributeurs peuvent eux aussi passer
+  des commandes et avoir des postes rattachés.
+  - `src/config.py` : nouvelle liste `CUSTOMER_CATEGORIES`
+    (`1- NEW`, `EN PROD`, `DISTRIBUTEUR`) — extensible.
+  - `odoorpc_impl._get_filter_category_ids()` itère sur cette liste.
+
+---
+
 ## [0.5.0] — 2026-05-15
 
 > Suite de la v0.4.0 : le **7ᵉ et dernier champ référencé** dans le
