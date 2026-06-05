@@ -212,6 +212,9 @@ class CustomerAssetWorkstation(models.Model):
             # Préfixe '_' obligatoire : Odoo refuse les valeurs Selection
             # commençant par un chiffre.
             ("_3m", "3M"),
+            # Choix explicite "Aucun" : poste sans plots inox. Distinct de la
+            # valeur vide (False = champ non renseigné).
+            ("aucun", "Aucun"),
         ],
         string="Plots inox",
         tracking=True,

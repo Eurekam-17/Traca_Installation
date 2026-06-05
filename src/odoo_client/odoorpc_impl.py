@@ -6,9 +6,14 @@ disponible (estimation 2027 — cf. CLAUDE.md § 2bis-C).
 
 Architecture v0.2.0 : un seul modèle ``customer.asset.workstation`` avec
 tous les champs. Le ``create_poste_client`` est en réalité un **UPSERT** :
-si une workstation existe déjà pour (client + hostname), elle est mise à
-jour ; sinon, elle est créée. Plus de modèle Traçabilité séparé, plus de
-rollback transactionnel à gérer.
+si une workstation existe déjà avec le même **N° de série PC**
+(``pc_serial_number``), elle est mise à jour ; sinon, elle est créée. Plus
+de modèle Traçabilité séparé, plus de rollback transactionnel à gérer.
+
+⚠️ La clé d'unicité est le N° de série PC, PAS le nom du poste (hostname) :
+plusieurs machines d'un même client peuvent porter le même hostname
+(``assist1``…), ce qui écraserait une autre fiche. Cette clé est cohérente
+avec ``find_poste_by_serial`` (détection de doublon, étape 2 GUI).
 """
 
 from __future__ import annotations
@@ -248,24 +253,40 @@ class OdoorpcClient(OdooClientBase):
         """UPSERT sur customer.asset.workstation.
 
         Stratégie :
-        1. Lookup d'une fiche existante par (partner_id, name=hostname)
+        1. Lookup d'une fiche existante par ``pc_serial_number`` (clé d'unicité
+           matérielle, cohérente avec ``find_poste_by_serial``)
         2. Construction du payload complet (champs natifs Scalizer + champs Drugcam)
         3. Si fiche trouvée → ``write()`` sur cet ID
         4. Sinon → ``create()`` d'une nouvelle fiche
+
+        ⚠️ La clé est le N° de série PC, PAS (client + hostname) : plusieurs
+        machines d'un même client peuvent partager le même hostname
+        (``assist1``…). Utiliser le hostname comme clé écraserait la fiche
+        d'une autre machine → perte de donnée.
+
+        Cas limite : si ``pc_serial_number`` est vide (``dmidecode`` indisponible,
+        improbable en root sur Rocky 9), aucune fiche n'est mise à jour — on crée
+        systématiquement une nouvelle fiche pour ne JAMAIS risquer d'écraser la
+        mauvaise.
         """
-        try:
-            workstation_model = self._client.env[config.ODOO_MODEL_POSTE]
-            existing = workstation_model.search(
-                [
-                    ("partner_id", "=", data.customer_id),
-                    ("name", "=", data.description),
-                ],
-                limit=1,
+        workstation_model = self._client.env[config.ODOO_MODEL_POSTE]
+        existing: list[int] = []
+        if data.pc_serial_number:
+            try:
+                existing = workstation_model.search(
+                    [("pc_serial_number", "=", data.pc_serial_number)],
+                    limit=1,
+                )
+            except odoorpc.error.RPCError as exc:
+                raise OdooWriteError(
+                    f"Lookup workstation existant échoué : {exc}"
+                ) from exc
+        else:
+            logger.warning(
+                "Aucun N° de série PC disponible : création d'une nouvelle "
+                "fiche workstation sans lookup (évite tout écrasement de fiche "
+                "existante)."
             )
-        except odoorpc.error.RPCError as exc:
-            raise OdooWriteError(
-                f"Lookup workstation existant échoué : {exc}"
-            ) from exc
 
         payload = self._build_workstation_payload(data)
 
@@ -274,8 +295,10 @@ class OdoorpcClient(OdooClientBase):
                 workstation_id = existing[0]
                 workstation_model.browse(workstation_id).write(payload)
                 logger.info(
-                    "Workstation existante mise à jour (id=%d, partner=%d, name=%r)",
-                    workstation_id, data.customer_id, data.description,
+                    "Workstation existante mise à jour (id=%d, pc_serial=%r, "
+                    "partner=%d, name=%r)",
+                    workstation_id, data.pc_serial_number, data.customer_id,
+                    data.description,
                 )
                 return workstation_id
 
@@ -291,8 +314,8 @@ class OdoorpcClient(OdooClientBase):
             )
 
         logger.info(
-            "Workstation créée (id=%d, partner=%d, name=%r)",
-            new_id, data.customer_id, data.description,
+            "Workstation créée (id=%d, pc_serial=%r, partner=%d, name=%r)",
+            new_id, data.pc_serial_number, data.customer_id, data.description,
         )
         return new_id
 

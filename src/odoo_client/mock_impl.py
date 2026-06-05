@@ -79,9 +79,13 @@ class MockOdooClient(OdooClientBase):
             list(existing_optical_block_serials)
             if existing_optical_block_serials else ["010001", "010003", "010012"]
         )
-        # Historique des UPSERT effectués en mode mock — accessible aux tests.
-        # Chaque entrée est une PosteData.
+        # État des fiches workstation après UPSERT en mode mock — accessible
+        # aux tests. Chaque entrée est une PosteData (l'état courant, pas un
+        # journal : un second UPSERT sur le même N° de série PC remplace
+        # l'entrée existante, comme le ferait Odoo).
         self.upserted_postes: list[PosteData] = []
+        # Mapping N° de série PC → ID Odoo simulé, pour distinguer create/update.
+        self._workstation_ids_by_pc_serial: dict[str, int] = {}
         self._authenticated = False
         self._id_generator = itertools.count(start=1000)
 
@@ -117,23 +121,48 @@ class MockOdooClient(OdooClientBase):
         return numbering.next_optical_block_serial(self._existing_optical_block_serials)
 
     def create_poste_client(self, data: PosteData) -> int:
-        """Mock UPSERT : on stocke le payload pour inspection dans les tests
-        et on retourne un nouvel ID à chaque appel (le mock ne distingue pas
-        encore create vs update — peu utile pour les tests unitaires)."""
+        """Mock UPSERT fidèle : la clé d'unicité est le N° de série PC
+        (``pc_serial_number``), comme dans l'implémentation odoorpc réelle.
+
+        - Si une fiche existe déjà avec ce N° de série PC → mise à jour
+          (remplacement de l'entrée, ID Odoo simulé conservé).
+        - Sinon → création (nouvel ID).
+        - Si le N° de série PC est vide → création systématique (jamais
+          d'écrasement).
+        """
         self._require_auth()
-        new_id = next(self._id_generator)
-        self.upserted_postes.append(data)
-        # Met à jour les pools de S/N pour que les next_*_serial reflètent
-        # le nouvel enregistrement (utile dans les tests d'intégration).
-        if data.workstation_serial_number:
-            self._existing_workstation_serials.append(data.workstation_serial_number)
-        if data.optical_block_serial:
-            self._existing_optical_block_serials.append(data.optical_block_serial)
-        logger.info(
-            "[MOCK] UPSERT customer.asset.workstation (id=%d) :\n%s",
-            new_id, _pretty(asdict(data)),
+
+        existing_id = (
+            self._workstation_ids_by_pc_serial.get(data.pc_serial_number)
+            if data.pc_serial_number else None
         )
-        return new_id
+
+        if existing_id is not None:
+            # Mise à jour : remplace l'entrée correspondante par le nouvel état.
+            for i, poste in enumerate(self.upserted_postes):
+                if poste.pc_serial_number == data.pc_serial_number:
+                    self.upserted_postes[i] = data
+                    break
+            workstation_id = existing_id
+            action = "UPDATE"
+        else:
+            workstation_id = next(self._id_generator)
+            self.upserted_postes.append(data)
+            if data.pc_serial_number:
+                self._workstation_ids_by_pc_serial[data.pc_serial_number] = workstation_id
+            # Pools de S/N mis à jour pour que next_*_serial reflète la
+            # nouvelle fiche (utile dans les tests d'intégration).
+            if data.workstation_serial_number:
+                self._existing_workstation_serials.append(data.workstation_serial_number)
+            if data.optical_block_serial:
+                self._existing_optical_block_serials.append(data.optical_block_serial)
+            action = "CREATE"
+
+        logger.info(
+            "[MOCK] UPSERT customer.asset.workstation (%s, id=%d) :\n%s",
+            action, workstation_id, _pretty(asdict(data)),
+        )
+        return workstation_id
 
     # ------------------------------------------------------------------ #
     # Helpers
@@ -183,6 +212,10 @@ class MockOdooClient(OdooClientBase):
             "previous_serial": previous_serial,
             "previous_date": previous_date,
         })
+        # Cohérence avec l'UPSERT : un poste déjà présent avec ce N° de série
+        # PC sera mis à jour (et non dupliqué) lors d'un create_poste_client.
+        if pc_serial:
+            self._workstation_ids_by_pc_serial[pc_serial] = poste_id
 
 
 def _pretty(data: dict[str, Any]) -> str:

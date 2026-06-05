@@ -12,6 +12,39 @@ versionnement sémantique simplifié `MAJOR.MINOR.PATCH` :
 
 ---
 
+## [0.6.1] — 2026-06-05
+
+> Correctif : la clé d'unicité de l'UPSERT devient le **N° de série PC**.
+> Ajout de l'option « Aucun » pour les plots inox.
+
+### Ajouté
+- **Plots inox : option « Aucun »** (poste sans plots inox), distincte de la
+  valeur vide « non renseigné ».
+  - Côté module Odoo `eurekam_drugcam_traca` (bump → 18.0.4.0.0) : nouvelle
+    valeur Selection `("aucun", "Aucun")` sur `inox_plot_type`. **Nécessite
+    une mise à niveau du module** pour être prise en compte côté serveur.
+  - Côté logiciel : ajout dans `src/data_options/type_plot_inox.json`.
+
+### Corrigé
+- **Risque d'écrasement de fiche (perte de donnée)** : l'UPSERT de
+  `create_poste_client` recherchait la fiche existante par
+  `(partner_id, name=hostname)`. Or le hostname (`assist1`, `assist2`…)
+  **n'est pas unique chez un même client** : deux machines physiques
+  distinctes pouvaient porter le même nom, et le second envoi écrasait la
+  fiche de la première.
+  - La clé d'unicité devient `pc_serial_number` (N° de série PC issu de
+    `dmidecode`, empreinte matérielle immuable) — **cohérente avec
+    `find_poste_by_serial`** (détection de doublon, étape 2).
+  - Une réexécution sur la même machine met désormais à jour la **bonne**
+    fiche (le hostname peut même avoir changé entre-temps).
+  - Cas limite : si le N° de série PC est vide (`dmidecode` indisponible),
+    on crée systématiquement une nouvelle fiche plutôt que de risquer
+    d'écraser la mauvaise.
+- `MockOdooClient.create_poste_client` simule désormais fidèlement cet
+  UPSERT par N° de série PC (create vs update). 3 tests de régression ajoutés.
+
+---
+
 ## [0.6.0] — 2026-06-04
 
 > Reconfiguration de la connexion Odoo sans redémarrage, et prise en compte

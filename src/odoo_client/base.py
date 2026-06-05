@@ -200,10 +200,15 @@ class OdooClientBase(ABC):
     def create_poste_client(self, data: PosteData) -> int:
         """UPSERT sur ``customer.asset.workstation``.
 
-        Si une fiche workstation existe pour le même client + même hostname,
-        elle est **mise à jour** avec les nouvelles valeurs. Sinon, une
-        nouvelle fiche est créée. Retourne dans tous les cas l'ID Odoo de
-        la workstation.
+        Si une fiche workstation existe avec le même **N° de série PC**
+        (``pc_serial_number``), elle est **mise à jour** avec les nouvelles
+        valeurs. Sinon, une nouvelle fiche est créée. Retourne dans tous les
+        cas l'ID Odoo de la workstation.
+
+        ⚠️ La clé d'unicité est le N° de série PC (empreinte matérielle), PAS
+        le nom du poste : plusieurs machines d'un même client peuvent partager
+        le même hostname (``assist1``…), ce qui écraserait une autre fiche.
+        Cette clé est cohérente avec :meth:`find_poste_by_serial`.
         """
 
     # ------------------------------------------------------------------ #
