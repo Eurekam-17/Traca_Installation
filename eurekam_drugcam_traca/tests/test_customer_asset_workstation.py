@@ -99,6 +99,15 @@ class TestCustomerAssetWorkstation(TransactionCase):
         )
         self.assertEqual(selection_dict["_3m"], "3M")
 
+    def test_inox_plot_type_aucun_value(self):
+        """La valeur "Aucun" (technique 'aucun') doit être acceptée."""
+        self.workstation.write({"inox_plot_type": "aucun"})
+        self.assertEqual(self.workstation.inox_plot_type, "aucun")
+        selection_dict = dict(
+            self.workstation._fields["inox_plot_type"]._description_selection(self.env)
+        )
+        self.assertEqual(selection_dict["aucun"], "Aucun")
+
     def test_full_payload_write(self):
         """Écrire un payload complet sur les 22 champs doit fonctionner."""
         self.workstation.write({

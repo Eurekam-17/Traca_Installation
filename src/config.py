@@ -111,6 +111,18 @@ def active_profile_label() -> str:
 # Validés avec Loïc — noms réels chez Eurekam.
 CUSTOMER_CATEGORY_PROJET = "1- NEW"
 CUSTOMER_CATEGORY_PROD = "EN PROD"
+# Distributeurs : revendeurs qui peuvent eux aussi nous passer des commandes,
+# donc des postes peuvent leur être rattachés. Validé avec Loïc le 2026-06-04.
+CUSTOMER_CATEGORY_DISTRIBUTEUR = "DISTRIBUTEUR"
+
+# Liste des étiquettes filtrées dans la liste déroulante des clients (étape 2).
+# Un client est proposé s'il porte AU MOINS L'UNE de ces étiquettes.
+# Pour en ajouter une, il suffit d'étendre cette liste.
+CUSTOMER_CATEGORIES: list[str] = [
+    CUSTOMER_CATEGORY_PROJET,
+    CUSTOMER_CATEGORY_PROD,
+    CUSTOMER_CATEGORY_DISTRIBUTEUR,
+]
 
 
 # ---------------------------------------------------------------------------

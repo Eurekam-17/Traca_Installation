@@ -125,6 +125,70 @@ class TestUpsert:
         assert authenticated_client.next_tracability_serial() == "AB000042"
 
 
+class TestUpsertUniqueKey:
+    """Régression : la clé d'unicité de l'UPSERT est le N° de série PC,
+    PAS le nom du poste (hostname). Deux machines d'un même client peuvent
+    partager le même hostname sans s'écraser mutuellement."""
+
+    def test_same_hostname_different_pc_serial_does_not_collide(
+        self, authenticated_client
+    ) -> None:
+        # Deux machines physiques distinctes, même client, même hostname.
+        machine_a = _full_poste()  # pc_serial_number="ABC1234"
+        machine_b = PosteData(
+            customer_id=machine_a.customer_id,
+            description=machine_a.description,  # même hostname "assist1"
+            os_version=machine_a.os_version,
+            assist_version=machine_a.assist_version,
+            mac_addresses="11:22:33:44:55:66",
+            pc_serial_number="XYZ9999",  # N° de série PC différent
+        )
+
+        id_a = authenticated_client.create_poste_client(machine_a)
+        id_b = authenticated_client.create_poste_client(machine_b)
+
+        # Deux fiches distinctes : pas d'écrasement.
+        assert id_a != id_b
+        assert len(authenticated_client.upserted_postes) == 2
+
+    def test_same_pc_serial_updates_existing_record(
+        self, authenticated_client
+    ) -> None:
+        # Réexécution sur la même machine (même N° de série PC) → mise à jour.
+        first = _full_poste()  # pc_serial_number="ABC1234"
+        second = PosteData(
+            customer_id=first.customer_id,
+            description="assist1-renomme",  # hostname changé
+            os_version=first.os_version,
+            assist_version="2.5.12",  # version mise à jour
+            mac_addresses=first.mac_addresses,
+            pc_serial_number=first.pc_serial_number,  # même machine
+        )
+
+        id_first = authenticated_client.create_poste_client(first)
+        id_second = authenticated_client.create_poste_client(second)
+
+        # Même fiche mise à jour : ID stable, une seule entrée reflétant l'état courant.
+        assert id_first == id_second
+        assert len(authenticated_client.upserted_postes) == 1
+        assert authenticated_client.upserted_postes[0].assist_version == "2.5.12"
+
+    def test_empty_pc_serial_always_creates(self, authenticated_client) -> None:
+        # Sans N° de série PC, jamais d'écrasement : on crée à chaque fois.
+        poste = PosteData(
+            customer_id=101,
+            description="assist1",
+            os_version="Rocky 9",
+            assist_version="2.5.11",
+            mac_addresses="aa:bb:cc",
+            pc_serial_number="",
+        )
+        id1 = authenticated_client.create_poste_client(poste)
+        id2 = authenticated_client.create_poste_client(poste)
+        assert id1 != id2
+        assert len(authenticated_client.upserted_postes) == 2
+
+
 class TestProductCatalog:
     """v0.4.0 : 3 nouvelles méthodes pour peupler les combos depuis Odoo."""
 

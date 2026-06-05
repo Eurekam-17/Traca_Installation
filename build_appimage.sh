@@ -25,7 +25,11 @@ set -euo pipefail
 APP_NAME="drugcam-traca"
 PYTHON_VERSION="3.11"
 WORK_DIR="$(cd "$(dirname "$0")" && pwd)"
-BUILD_DIR="${WORK_DIR}/appimage-build"
+# BUILD_DIR contient un venv et l'AppDir de python-appimage, qui reposent sur
+# des liens symboliques. Si le projet vit sur un partage VirtualBox (vboxsf)
+# ou un FS sans symlinks, la création échoue ("Operation not permitted").
+# On peut alors pointer BUILD_DIR vers un FS réel : BUILD_DIR=~/traca-build ./build_appimage.sh
+BUILD_DIR="${BUILD_DIR:-${WORK_DIR}/appimage-build}"
 DIST_DIR="${WORK_DIR}/dist"
 VENV_DIR="${BUILD_DIR}/venv"
 

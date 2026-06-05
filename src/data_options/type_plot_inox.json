@@ -3,6 +3,7 @@
   "label": "Plots inox",
   "options": [
     { "display": "Lohmann", "value": "lohmann" },
-    { "display": "3M", "value": "_3m" }
+    { "display": "3M", "value": "_3m" },
+    { "display": "Aucun", "value": "aucun" }
   ]
 }
