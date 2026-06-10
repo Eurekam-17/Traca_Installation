@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
-"""Étend customer.asset.workstation (module Scalizer) avec les 22 champs
-métier Drugcam Traca.
+"""Extends customer.asset.workstation (Scalizer module) with the 22 Drugcam
+Traca business fields.
 
-Tous les champs ont ``tracking=True`` pour être logués dans le chatter de
-la fiche poste (audit Odoo natif).
+All fields have ``tracking=True`` so changes are logged in the workstation
+record's chatter (native Odoo audit trail).
 
-Conventions :
-- Nom technique en anglais snake_case (cohérent avec les champs Scalizer
-  natifs : software_fedora_version, mac_address, etc.)
-- ``string`` (libellé affiché) en français
-- Pour les Selections : valeurs techniques en snake_case, libellés en français
-- Pour la valeur "3M" qui commence par un chiffre, on utilise "_3m" comme
-  valeur technique (Odoo refuse les valeurs Selection commençant par un
-  chiffre).
-- Pour les types Caméra / UC / Objectif (cf. v18.0.2.0.0) : Many2one vers
-  ``product.template`` au lieu de Selection. Permet d'enrichir le catalogue
-  d'articles dans Odoo sans toucher au code du module.
+Conventions:
+- Technical names in English snake_case (consistent with native Scalizer fields:
+  software_fedora_version, mac_address, etc.)
+- ``string`` (displayed label) in English; French translations in i18n/fr.po
+- For Selections: technical values in snake_case, labels in English
+- For the "3M" value that starts with a digit, we use "_3m" as the technical
+  value (Odoo rejects Selection values starting with a digit).
+- For Camera / UC / Objective types (cf. v18.0.2.0.0): Many2one to
+  ``product.template`` instead of Selection. Allows enriching the product
+  catalog in Odoo without touching the module code.
 """
 
 from odoo import fields, models
 
 
-# Domaines de filtrage des Many2one product.template
-# Convention de nommage Eurekam : préfixe "PC ", "CAMERA " ou "Caméra ", "Objectif "
+# Many2one product.template filter domains
+# Eurekam naming convention: prefix "PC ", "CAMERA " or "Caméra ", "Objectif "
 DOMAIN_CAMERA = (
     "['|', ('name', '=ilike', 'CAMERA %'), ('name', '=ilike', 'Caméra %')]"
 )
@@ -35,12 +34,12 @@ class CustomerAssetWorkstation(models.Model):
     _inherit = "customer.asset.workstation"
 
     # ------------------------------------------------------------------ #
-    # Identification matérielle
+    # Hardware identification
     # ------------------------------------------------------------------ #
     workstation_serial_number = fields.Char(
-        string="N° de série équipement",
+        string="Workstation Serial Number",
         tracking=True,
-        help="Numéro de série interne Eurekam (format AB000001).",
+        help="Eurekam internal serial number (format AB000001).",
     )
     workstation_type = fields.Selection(
         selection=[
@@ -48,111 +47,110 @@ class CustomerAssetWorkstation(models.Model):
             ("iso_sieve", "Iso Sieve"),
             ("iso_eurobio", "Iso Eurobio"),
             ("iso_getinge", "Iso Getinge"),
-            ("hotte_faster", "Hotte Faster"),
-            ("hotte_thermofisher", "Hotte Thermofisher"),
-            ("hotte_ads", "Hotte ADS"),
-            ("hotte_berner", "Hotte Berner"),
-            ("autres", "Autres"),
+            ("hotte_faster", "Faster Hood"),
+            ("hotte_thermofisher", "Thermofisher Hood"),
+            ("hotte_ads", "ADS Hood"),
+            ("hotte_berner", "Berner Hood"),
+            ("autres", "Other"),
         ],
-        string="Type d'enceinte / hotte",
+        string="Enclosure / Hood Type",
         tracking=True,
     )
     installation_date = fields.Date(
-        string="Date d'installation",
+        string="Installation Date",
         tracking=True,
     )
 
     # ------------------------------------------------------------------ #
-    # UC
+    # UC (workstation unit)
     # ------------------------------------------------------------------ #
     uc_model = fields.Many2one(
         comodel_name="product.template",
-        string="Type UC",
+        string="UC Type",
         domain=DOMAIN_PC,
         tracking=True,
-        help="Référence de l'UC dans le catalogue d'articles Odoo "
-             "(filtre sur préfixe 'PC ').",
+        help="UC reference in the Odoo product catalog (filtered by 'PC ' prefix).",
     )
     pc_serial_number = fields.Char(
-        string="N° de série PC",
+        string="PC Serial Number",
         tracking=True,
-        help="Numéro de série du PC issu de dmidecode -t system.",
+        help="PC serial number from dmidecode -t system.",
     )
     cpu_version = fields.Char(
-        string="Version CPU",
+        string="CPU Version",
         tracking=True,
-        help="Référence CPU issue de dmidecode -s processor-version.",
+        help="CPU reference from dmidecode -s processor-version.",
     )
 
     # ------------------------------------------------------------------ #
-    # Bloc optique
+    # Optical block
     # ------------------------------------------------------------------ #
     optical_block_type = fields.Selection(
         selection=[
-            ("sortie_droite", "Sortie droite"),
-            ("sortie_laterale", "Sortie latérale"),
+            ("sortie_droite", "Right Exit"),
+            ("sortie_laterale", "Side Exit"),
             ("democom", "Democom"),
         ],
-        string="Type de bloc optique",
+        string="Optical Block Type",
         tracking=True,
     )
     optical_block_serial = fields.Char(
-        string="N° de série bloc optique",
+        string="Optical Block Serial Number",
         tracking=True,
-        help="Numéro de série interne Eurekam (format 010001).",
+        help="Eurekam internal serial number (format 010001).",
     )
 
     # ------------------------------------------------------------------ #
-    # Caméra A (plus petit S/N parmi les 2 caméras détectées)
+    # Camera A (lowest S/N among the 2 detected cameras)
     # ------------------------------------------------------------------ #
     camera_a_model = fields.Many2one(
         comodel_name="product.template",
-        string="Type caméra A",
+        string="Camera A Type",
         domain=DOMAIN_CAMERA,
         tracking=True,
-        help="Référence de la caméra dans le catalogue Odoo "
-             "(filtre sur préfixe 'CAMERA ' ou 'Caméra ').",
+        help="Camera reference in the Odoo product catalog "
+             "(filtered by 'CAMERA ' or 'Caméra ' prefix).",
     )
     camera_a_serial = fields.Char(
-        string="N° caméra A",
+        string="Camera A Serial Number",
         tracking=True,
     )
     camera_a_objective = fields.Many2one(
         comodel_name="product.template",
-        string="Type objectif caméra A",
+        string="Camera A Objective Type",
         domain=DOMAIN_OBJECTIVE,
         tracking=True,
-        help="Référence de l'objectif dans le catalogue Odoo "
-             "(filtre sur préfixe 'Objectif ').",
+        help="Objective reference in the Odoo product catalog "
+             "(filtered by 'Objectif ' prefix).",
     )
     camera_a_cable = fields.Selection(
         selection=[
             ("fire_wire", "FIRE WIRE"),
             ("alysium", "ALYSIUM"),
             ("alysium_v2", "ALYSIUM V2"),
-            ("alysium_blinde_teli", "ALYSIUM BLINDÉ POUR TELI"),
-            ("alysium_blinde_alvium", "ALYSIUM BLINDÉ POUR ALVIUM"),
+            ("alysium_blinde_teli", "ALYSIUM SHIELDED FOR TELI"),
+            ("alysium_blinde_alvium", "ALYSIUM SHIELDED FOR ALVIUM"),
         ],
-        string="Type de câble caméra A",
+        string="Camera A Cable Type",
         tracking=True,
     )
 
     # ------------------------------------------------------------------ #
-    # Caméra B (plus grand S/N)
+    # Camera B (highest S/N)
     # ------------------------------------------------------------------ #
     camera_b_model = fields.Many2one(
         comodel_name="product.template",
-        string="Type caméra B",
+        string="Camera B Type",
         domain=DOMAIN_CAMERA,
         tracking=True,
     )
     camera_b_serial = fields.Char(
-        string="N° caméra B",
+        string="Camera B Serial Number",
         tracking=True,
     )
     camera_b_objective = fields.Many2one(
         comodel_name="product.template",
-        string="Type objectif caméra B",
+        string="Camera B Objective Type",
         domain=DOMAIN_OBJECTIVE,
         tracking=True,
     )
@@ -161,39 +159,39 @@ class CustomerAssetWorkstation(models.Model):
             ("fire_wire", "FIRE WIRE"),
             ("alysium", "ALYSIUM"),
             ("alysium_v2", "ALYSIUM V2"),
-            ("alysium_blinde_teli", "ALYSIUM BLINDÉ POUR TELI"),
-            ("alysium_blinde_alvium", "ALYSIUM BLINDÉ POUR ALVIUM"),
+            ("alysium_blinde_teli", "ALYSIUM SHIELDED FOR TELI"),
+            ("alysium_blinde_alvium", "ALYSIUM SHIELDED FOR ALVIUM"),
         ],
-        string="Type de câble caméra B",
+        string="Camera B Cable Type",
         tracking=True,
     )
 
     # ------------------------------------------------------------------ #
-    # Caméra de scène
+    # Scene camera
     # ------------------------------------------------------------------ #
     scene_camera_model = fields.Many2one(
         comodel_name="product.template",
-        string="Type caméra de scène",
+        string="Scene Camera Type",
         domain=DOMAIN_CAMERA,
         tracking=True,
-        help="Référence de la caméra de scène dans le catalogue Odoo "
-             "(même filtre que les caméras A/B).",
+        help="Scene camera reference in the Odoo product catalog "
+             "(same filter as cameras A/B).",
     )
     scene_camera_serial = fields.Char(
-        string="N° caméra de scène",
+        string="Scene Camera Serial Number",
         tracking=True,
     )
 
     # ------------------------------------------------------------------ #
-    # Accessoires
+    # Accessories
     # ------------------------------------------------------------------ #
     mouse_model = fields.Many2one(
         comodel_name="product.template",
-        string="Type de souris",
+        string="Mouse Type",
         domain=DOMAIN_MOUSE,
         tracking=True,
-        help="Référence de la souris dans le catalogue Odoo "
-             "(filtre sur préfixe 'Souris ').",
+        help="Mouse reference in the Odoo product catalog "
+             "(filtered by 'Souris ' prefix).",
     )
     power_supply_type = fields.Selection(
         selection=[
@@ -203,28 +201,27 @@ class CustomerAssetWorkstation(models.Model):
             ("cwt_120w", "CWT 120W"),
             ("mean_well_120w", "MEAN WELL 120W"),
         ],
-        string="Bloc d'alimentation",
+        string="Power Supply",
         tracking=True,
     )
     inox_plot_type = fields.Selection(
         selection=[
             ("lohmann", "Lohmann"),
-            # Préfixe '_' obligatoire : Odoo refuse les valeurs Selection
-            # commençant par un chiffre.
+            # '_' prefix required: Odoo rejects Selection values starting with a digit.
             ("_3m", "3M"),
-            # Choix explicite "Aucun" : poste sans plots inox. Distinct de la
-            # valeur vide (False = champ non renseigné).
-            ("aucun", "Aucun"),
+            # Explicit "None" choice: workstation without inox plots.
+            # Distinct from the empty value (False = field not filled in).
+            ("aucun", "None"),
         ],
-        string="Plots inox",
+        string="Inox Plots",
         tracking=True,
     )
 
     # ------------------------------------------------------------------ #
-    # Texte libre
+    # Free text
     # ------------------------------------------------------------------ #
     comments = fields.Text(
-        string="Commentaires",
+        string="Comments",
         tracking=True,
-        help="Notes libres sur l'installation de ce poste.",
+        help="Free notes about this workstation installation.",
     )

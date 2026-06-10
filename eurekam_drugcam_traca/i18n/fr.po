@@ -1,0 +1,274 @@
+# French translation for Eurekam Drugcam Traceability
+# This file is distributed under the same license as the Eurekam Drugcam Traceability package.
+# Eurekam <loic.tamarelle@eurekam.fr>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-10 00:00+0000\n"
+"PO-Revision-Date: 2026-06-10 00:00+0000\n"
+"Last-Translator: Eurekam <loic.tamarelle@eurekam.fr>\n"
+"Language-Team: French <fr@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__workstation_serial_number
+msgid "Workstation Serial Number"
+msgstr "N° de série équipement"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__workstation_type
+msgid "Enclosure / Hood Type"
+msgstr "Type d'enceinte / hotte"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__installation_date
+msgid "Installation Date"
+msgstr "Date d'installation"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__uc_model
+msgid "UC Type"
+msgstr "Type UC"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__pc_serial_number
+msgid "PC Serial Number"
+msgstr "N° de série PC"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__cpu_version
+msgid "CPU Version"
+msgstr "Version CPU"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__optical_block_type
+msgid "Optical Block Type"
+msgstr "Type de bloc optique"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__optical_block_serial
+msgid "Optical Block Serial Number"
+msgstr "N° de série bloc optique"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_model
+msgid "Camera A Type"
+msgstr "Type caméra A"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_serial
+msgid "Camera A Serial Number"
+msgstr "N° caméra A"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_objective
+msgid "Camera A Objective Type"
+msgstr "Type objectif caméra A"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_cable
+msgid "Camera A Cable Type"
+msgstr "Type de câble caméra A"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_b_model
+msgid "Camera B Type"
+msgstr "Type caméra B"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_b_serial
+msgid "Camera B Serial Number"
+msgstr "N° caméra B"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_b_objective
+msgid "Camera B Objective Type"
+msgstr "Type objectif caméra B"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__camera_b_cable
+msgid "Camera B Cable Type"
+msgstr "Type de câble caméra B"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__scene_camera_model
+msgid "Scene Camera Type"
+msgstr "Type caméra de scène"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__scene_camera_serial
+msgid "Scene Camera Serial Number"
+msgstr "N° caméra de scène"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__mouse_model
+msgid "Mouse Type"
+msgstr "Type de souris"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__power_supply_type
+msgid "Power Supply"
+msgstr "Bloc d'alimentation"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__inox_plot_type
+msgid "Inox Plots"
+msgstr "Plots inox"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,field_description:eurekam_drugcam_traca.field_customer_asset_workstation__comments
+msgid "Comments"
+msgstr "Commentaires"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__workstation_serial_number
+msgid "Eurekam internal serial number (format AB000001)."
+msgstr "Numéro de série interne Eurekam (format AB000001)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__uc_model
+msgid "UC reference in the Odoo product catalog (filtered by 'PC ' prefix)."
+msgstr "Référence de l'UC dans le catalogue d'articles Odoo (filtre sur préfixe « PC »)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__pc_serial_number
+msgid "PC serial number from dmidecode -t system."
+msgstr "Numéro de série du PC issu de dmidecode -t system."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__cpu_version
+msgid "CPU reference from dmidecode -s processor-version."
+msgstr "Référence CPU issue de dmidecode -s processor-version."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__optical_block_serial
+msgid "Eurekam internal serial number (format 010001)."
+msgstr "Numéro de série interne Eurekam (format 010001)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_model
+msgid "Camera reference in the Odoo product catalog (filtered by 'CAMERA ' or 'Caméra ' prefix)."
+msgstr "Référence de la caméra dans le catalogue Odoo (filtre sur préfixe « CAMERA » ou « Caméra »)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__camera_a_objective
+msgid "Objective reference in the Odoo product catalog (filtered by 'Objectif ' prefix)."
+msgstr "Référence de l'objectif dans le catalogue Odoo (filtre sur préfixe « Objectif »)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__scene_camera_model
+msgid "Scene camera reference in the Odoo product catalog (same filter as cameras A/B)."
+msgstr "Référence de la caméra de scène dans le catalogue Odoo (même filtre que les caméras A/B)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__mouse_model
+msgid "Mouse reference in the Odoo product catalog (filtered by 'Souris ' prefix)."
+msgstr "Référence de la souris dans le catalogue Odoo (filtre sur préfixe « Souris »)."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields,help:eurekam_drugcam_traca.field_customer_asset_workstation__comments
+msgid "Free notes about this workstation installation."
+msgstr "Notes libres sur l'installation de ce poste."
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__workstation_type__hotte_faster
+msgid "Faster Hood"
+msgstr "Hotte Faster"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__workstation_type__hotte_thermofisher
+msgid "Thermofisher Hood"
+msgstr "Hotte Thermofisher"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__workstation_type__hotte_ads
+msgid "ADS Hood"
+msgstr "Hotte ADS"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__workstation_type__hotte_berner
+msgid "Berner Hood"
+msgstr "Hotte Berner"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__workstation_type__autres
+msgid "Other"
+msgstr "Autres"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__optical_block_type__sortie_droite
+msgid "Right Exit"
+msgstr "Sortie droite"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__optical_block_type__sortie_laterale
+msgid "Side Exit"
+msgstr "Sortie latérale"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__camera_a_cable__alysium_blinde_teli
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__camera_b_cable__alysium_blinde_teli
+msgid "ALYSIUM SHIELDED FOR TELI"
+msgstr "ALYSIUM BLINDÉ POUR TELI"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__camera_a_cable__alysium_blinde_alvium
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__camera_b_cable__alysium_blinde_alvium
+msgid "ALYSIUM SHIELDED FOR ALVIUM"
+msgstr "ALYSIUM BLINDÉ POUR ALVIUM"
+
+#. module: eurekam_drugcam_traca
+#: model:ir.model.fields.selection,name:eurekam_drugcam_traca.selection__customer_asset_workstation__inox_plot_type__aucun
+msgid "None"
+msgstr "Aucun"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Drugcam Hardware Configuration"
+msgstr "Configuration matérielle Drugcam"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Optical Block"
+msgstr "Bloc optique"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Scene Camera"
+msgstr "Caméra de scène"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Camera A (smallest S/N)"
+msgstr "Caméra A (plus petit S/N)"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Camera B (largest S/N)"
+msgstr "Caméra B (plus grand S/N)"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Accessories"
+msgstr "Accessoires"
+
+#. module: eurekam_drugcam_traca
+#: view:customer.asset.workstation:eurekam_drugcam_traca.customer_asset_workstation_form_drugcam
+msgid "Free notes about this workstation installation..."
+msgstr "Notes libres sur l'installation de ce poste…"
+
+#. module: eurekam_drugcam_traca
+#: view:res.partner:eurekam_drugcam_traca.res_partner_form_drugcam_section_titles
+msgid "Control Servers"
+msgstr "Serveurs Control"
+
+#. module: eurekam_drugcam_traca
+#: view:res.partner:eurekam_drugcam_traca.res_partner_form_drugcam_section_titles
+msgid "Assist Workstations"
+msgstr "Postes Assist"

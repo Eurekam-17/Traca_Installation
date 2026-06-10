@@ -100,13 +100,12 @@ class TestCustomerAssetWorkstation(TransactionCase):
         self.assertEqual(selection_dict["_3m"], "3M")
 
     def test_inox_plot_type_aucun_value(self):
-        """La valeur "Aucun" (technique 'aucun') doit être acceptée."""
+        """The "None" (technical value 'aucun') selection must be accepted."""
         self.workstation.write({"inox_plot_type": "aucun"})
         self.assertEqual(self.workstation.inox_plot_type, "aucun")
-        selection_dict = dict(
-            self.workstation._fields["inox_plot_type"]._description_selection(self.env)
-        )
-        self.assertEqual(selection_dict["aucun"], "Aucun")
+        # Check the key exists in the selection (label is translated via i18n/fr.po).
+        selection_keys = [k for k, _l in self.workstation._fields["inox_plot_type"].selection]
+        self.assertIn("aucun", selection_keys)
 
     def test_full_payload_write(self):
         """Écrire un payload complet sur les 22 champs doit fonctionner."""
@@ -165,8 +164,10 @@ class TestCustomerAssetWorkstation(TransactionCase):
              ("res_id", "=", self.workstation.id)]
         )
         self.workstation.write({"workstation_type": "hotte_faster"})
-        # Force la création des messages tracking (parfois différée)
         self.workstation.flush_recordset()
+        # En Odoo 18 les messages tracking sont créés via un hook precommit ;
+        # il faut l'exécuter explicitement en contexte de test (pas de commit réel).
+        self.env.cr.precommit.run()
         new_count = self.env["mail.message"].search_count(
             [("model", "=", "customer.asset.workstation"),
              ("res_id", "=", self.workstation.id)]
