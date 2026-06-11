@@ -139,10 +139,28 @@ class FormStep(BaseStep):
 
     # Champs libres saisis manuellement (Char/Text) — mapping draft attr → label
     FREE_TEXT_FIELDS: dict[str, str] = {
-        "workstation_name": "Nom du poste (libre, défaut = hostname)",
-        "workstation_serial_number": "N° de série du poste",
         "scene_camera_serial": "N° de série caméra de scène",
         "comments": "Commentaires (texte libre)",
+    }
+
+    # Présélections par défaut pour les champs Many2one product.template.
+    # Valeur = fragment du nom Odoo (MatchContains). Suffisamment distinctif
+    # pour ne matcher qu'un seul produit dans le catalogue Eurekam.
+    PRODUCT_DEFAULTS: dict[str, str] = {
+        "objectif_a_id": "LM8JC",
+        "objectif_b_id": "LM12JC",
+        "souris_id": "GPKM-408W",
+        "modele_uc_id": "eCW475",
+        "scene_camera_model_id": "ELP-USB500W05G",
+    }
+
+    # Présélections par défaut pour les champs Selection (depuis data_options JSON).
+    # Valeur = userData technique (valeur Odoo), plus fiable que le libellé affiché.
+    SELECTION_DEFAULTS: dict[str, str] = {
+        "cable_a": "alysium_blinde_alvium",
+        "cable_b": "alysium_blinde_alvium",
+        "type_bloc_alim": "mean_well_120w",
+        "type_plot_inox": "_3m",
     }
 
     def __init__(
@@ -256,12 +274,14 @@ class FormStep(BaseStep):
                     f"⚠️ {filename} introuvable — saisie libre (vérifier valeur Odoo)"
                 )
 
-            # Présélection de la valeur déjà présente dans le draft.
-            # Utile si le draft a été partiellement rempli (retour en arrière).
-            # Le technicien peut toujours changer.
+            # Présélection : valeur du draft (retour en arrière) OU défaut.
             current_value = getattr(self._draft, attr, "")
             if current_value:
                 idx = combo.findData(current_value)
+                if idx >= 0:
+                    combo.setCurrentIndex(idx)
+            elif attr in self.SELECTION_DEFAULTS:
+                idx = combo.findData(self.SELECTION_DEFAULTS[attr])
                 if idx >= 0:
                     combo.setCurrentIndex(idx)
 
@@ -408,6 +428,16 @@ class FormStep(BaseStep):
                 idx = combo.findData(current_id)
                 if idx >= 0:
                     combo.setCurrentIndex(idx)
+            elif attr in self.PRODUCT_DEFAULTS:
+                # Valeur par défaut Many2one (objectif KOWA, souris, UC, scène…)
+                default_fragment = self.PRODUCT_DEFAULTS[attr]
+                idx = combo.findText(default_fragment, Qt.MatchFlag.MatchContains)
+                if idx >= 0:
+                    combo.setCurrentIndex(idx)
+                    logger.debug(
+                        "Présélection par défaut %s → '%s'",
+                        attr, combo.itemText(idx),
+                    )
 
         self._products_loaded = True
 
@@ -483,21 +513,32 @@ class FormStep(BaseStep):
         if info.camera_pair:
             mapping["camera_a_serial"] = info.camera_pair.camera_a.serial
             mapping["camera_b_serial"] = info.camera_pair.camera_b.serial
-            # Le modèle brut détecté (ex. "Allied Vision Alvium 1800 U-319c")
-            # est affiché en tooltip sur les combos Many2one pour aider
-            # le technicien à choisir le bon produit dans le catalogue Odoo.
+            # Auto-sélection du produit Odoo correspondant au modèle détecté
+            # via USB (ex. "Allied Vision Alvium 1800 U-319c").
+            # Recherche par correspondance partielle (MatchContains) : le nom
+            # Odoo (ex. "CAMERA Allied Vision U-319c") n'est pas identique mais
+            # contient généralement le suffixe du modèle USB.
             for combo_attr, detected in (
                 ("type_camera_a_id", info.camera_pair.camera_a.product),
                 ("type_camera_b_id", info.camera_pair.camera_b.product),
             ):
                 combo = self._product_combos.get(combo_attr)
                 if combo and detected:
-                    existing = combo.toolTip()
-                    prefix = f"Modèle détecté : {detected}"
-                    if existing and "Modèle détecté" not in existing:
-                        combo.setToolTip(f"{prefix}\n{existing}")
+                    idx = combo.findText(detected, Qt.MatchFlag.MatchContains)
+                    if idx >= 0:
+                        combo.setCurrentIndex(idx)
+                        logger.info(
+                            "Auto-sélection %s → '%s' (détecté : '%s')",
+                            combo_attr, combo.itemText(idx), detected,
+                        )
                     else:
-                        combo.setToolTip(prefix)
+                        logger.info(
+                            "Modèle caméra '%s' non trouvé dans le catalogue "
+                            "Odoo pour %s — sélection manuelle requise.",
+                            detected, combo_attr,
+                        )
+                    # Tooltip d'info dans tous les cas (confirmation ou aide)
+                    combo.setToolTip(f"Modèle détecté : {detected}")
         else:
             mapping["camera_a_serial"] = ""
             mapping["camera_b_serial"] = ""

@@ -3,8 +3,8 @@
 
     <!--
     ============================================================
-    Vue form du poste : ajout des sections Drugcam après le bloc
-    natif Scalizer (description, partner, network, etc.).
+    Form view of the workstation: Drugcam sections added after
+    the native Scalizer block (description, partner, network, etc.).
     ============================================================
     -->
     <record id="customer_asset_workstation_form_drugcam" model="ir.ui.view">
@@ -14,7 +14,7 @@
         <field name="priority">20</field>
         <field name="arch" type="xml">
             <xpath expr="//sheet/group" position="after">
-                <group string="Configuration matérielle Drugcam">
+                <group string="Drugcam Hardware Configuration">
                     <group string="Identification">
                         <field name="workstation_type"/>
                         <field name="workstation_serial_number"/>
@@ -27,30 +27,30 @@
                     </group>
                 </group>
                 <group>
-                    <group string="Bloc optique">
+                    <group string="Optical Block">
                         <field name="optical_block_type"/>
                         <field name="optical_block_serial"/>
                     </group>
-                    <group string="Caméra de scène">
+                    <group string="Scene Camera">
                         <field name="scene_camera_model"/>
                         <field name="scene_camera_serial"/>
                     </group>
                 </group>
                 <group>
-                    <group string="Caméra A (plus petit S/N)">
+                    <group string="Camera A (smallest S/N)">
                         <field name="camera_a_model"/>
                         <field name="camera_a_serial"/>
                         <field name="camera_a_objective"/>
                         <field name="camera_a_cable"/>
                     </group>
-                    <group string="Caméra B (plus grand S/N)">
+                    <group string="Camera B (largest S/N)">
                         <field name="camera_b_model"/>
                         <field name="camera_b_serial"/>
                         <field name="camera_b_objective"/>
                         <field name="camera_b_cable"/>
                     </group>
                 </group>
-                <group string="Accessoires">
+                <group string="Accessories">
                     <group>
                         <field name="mouse_model"/>
                         <field name="power_supply_type"/>
@@ -59,9 +59,9 @@
                         <field name="inox_plot_type"/>
                     </group>
                 </group>
-                <group string="Commentaires">
+                <group string="Comments">
                     <field name="comments" nolabel="1"
-                           placeholder="Notes libres sur l'installation de ce poste…"/>
+                           placeholder="Free notes about this workstation installation..."/>
                 </group>
             </xpath>
         </field>
@@ -69,8 +69,8 @@
 
     <!--
     ============================================================
-    Vue list standalone du poste : 22 colonnes Drugcam optionnelles.
-    Chacune en optional="hide" : visible via le sélecteur ⚙️.
+    Standalone list view of the workstation: 22 optional Drugcam columns.
+    Each with optional="hide": visible via the ⚙️ column selector.
     ============================================================
     -->
     <record id="customer_asset_workstation_list_drugcam" model="ir.ui.view">

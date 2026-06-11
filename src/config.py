@@ -32,10 +32,10 @@ logger = logging.getLogger(__name__)
 # Pour ajouter un profil (ex : pré-prod), ajouter une entrée à PROFILES.
 PROFILES: dict[str, dict[str, str | int]] = {
     "staging": {
-        "label": "Sandbox (eurekam-sandbox-32137656)",
+        "label": "Sandbox (eurekam-sandbox-32757089)",
         "host": "eurekam-sandbox.odoo.com",
-        "db": "eurekam-sandbox-32137656",
-        "login": "traca-bot@eurekam.fr",
+        "db": "eurekam-sandbox-32757089",
+        "login": "loic.tamarelle@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,
     },
@@ -45,7 +45,7 @@ PROFILES: dict[str, dict[str, str | int]] = {
         # Nom interne Odoo.sh de la base prod (différent du sous-domaine
         # public qui est juste `eurekam`). Confirmé par Loïc le 2026-05-15.
         "db": "tecliberp-eurekam-main-7835310",
-        "login": "traca-bot@eurekam.fr",
+        "login": "loic.tamarelle@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,
     },

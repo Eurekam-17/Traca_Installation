@@ -21,10 +21,10 @@
         <field name="priority">26</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='environement_ids']/.." position="attributes">
-                <attribute name="string">Serveurs Control</attribute>
+                <attribute name="string">Control Servers</attribute>
             </xpath>
             <xpath expr="//field[@name='workstation_ids']/.." position="attributes">
-                <attribute name="string">Postes Assist</attribute>
+                <attribute name="string">Assist Workstations</attribute>
             </xpath>
         </field>
     </record>

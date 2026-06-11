@@ -68,7 +68,8 @@ côté logiciel `drugcam-traca` (qui affichera un message d'aide).
 
 ### Via Odoo.sh
 
-1. Ajouter ce repo (ou ce sous-dossier) au dépôt Git lié à votre instance Odoo.sh.
+1. Ajouter le repo `Eurekam-17/Traca_Installation` comme **submodule** du repo connecté à
+   votre instance Odoo.sh (le module `eurekam_drugcam_traca/` est à la racine du repo).
 2. Sur Odoo.sh : push → build → le module devient disponible.
 3. Dans Odoo : **Apps → Mettre à jour la liste** → rechercher "Eurekam Drugcam" → **Installer**.
 
@@ -76,7 +77,7 @@ côté logiciel `drugcam-traca` (qui affichera un message d'aide).
 
 ```bash
 # Copier le module dans le dossier addons d'Odoo
-cp -r odoo_module/eurekam_drugcam_traca /path/to/odoo/addons/
+cp -r eurekam_drugcam_traca /path/to/odoo/addons/
 
 # Mettre à jour la liste des modules
 odoo -u all --stop-after-init -d <database>

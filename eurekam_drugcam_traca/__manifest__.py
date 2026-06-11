@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Eurekam Drugcam Traçabilité",
-    "summary": "Champs métier Drugcam Traca pour les postes Assist (matériel,"
-               " caméras, accessoires, commentaires).",
+    "name": "Eurekam Drugcam Traceability",
+    "summary": "Drugcam Traca business fields for Assist workstations (hardware,"
+               " cameras, accessories, comments).",
     "description": """
-Module d'extension pour le projet de traçabilité des installations Drugcam.
+Extension module for the Drugcam installation traceability project.
 
-Étend le modèle ``customer.asset.workstation`` (fourni par le module
-prestataire ``s6r_eurekam_customer_assets`` de Scalizer) avec 22 champs
-métier nécessaires au logiciel ``drugcam-traca`` lancé par les techniciens
-Eurekam lors de chaque installation chez un client.
+Extends the ``customer.asset.workstation`` model (provided by the Scalizer
+module ``s6r_eurekam_customer_assets``) with 22 business fields required by
+the ``drugcam-traca`` application run by Eurekam technicians during each
+customer installation.
 
-Sections couvertes :
-- Identification matérielle (type d'enceinte, n° série équipement, date)
-- UC (modèle, n° série PC, version CPU)
-- Bloc optique (type, n° série)
-- Caméra A et B (type, n° série, objectif, câble)
-- Caméra de scène (type, n° série)
-- Accessoires (souris, bloc d'alim, plots inox)
-- Commentaires libres
+Sections covered:
+- Hardware identification (enclosure type, workstation serial number, date)
+- UC (model, PC serial number, CPU version)
+- Optical block (type, serial number)
+- Camera A and B (type, serial number, objective, cable)
+- Scene camera (type, serial number)
+- Accessories (mouse, power supply, inox plots)
+- Free comments
 
-Toutes les modifications sont trackées dans le chatter (audit Odoo natif).
+All modifications are tracked in the chatter (native Odoo audit trail).
 
-Logiciel client associé :
+Associated client application:
 https://github.com/Eurekam-17/Traca_Installation
 """,
     "version": "18.0.4.0.0",
