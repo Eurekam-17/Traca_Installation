@@ -39,6 +39,14 @@ PROFILES: dict[str, dict[str, str | int]] = {
         "protocol": "jsonrpc+ssl",
         "port": 443,
     },
+    "dev": {
+        "label": "Staging Scalizer (eurekam-staging-33601704)",
+        "host": "eurekam-staging-33601704.dev.odoo.com",
+        "db": "eurekam-staging-33601704",
+        "login": "loic.tamarelle@eurekam.fr",
+        "protocol": "jsonrpc+ssl",
+        "port": 443,
+    },
     "prod": {
         "label": "Production (eurekam.odoo.com)",
         "host": "eurekam.odoo.com",
