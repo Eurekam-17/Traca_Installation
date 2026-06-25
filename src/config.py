@@ -23,13 +23,12 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Profils d'environnement Odoo
 # ---------------------------------------------------------------------------
-# ⚠️ Choix de design : par défaut on tape sur la STAGING. Cela évite
-# qu'une erreur de config d'un nouveau poste fasse écrire en prod par
-# accident. Pour passer en prod il faut le déclarer explicitement via :
-#   - argument CLI : --env prod
-#   - variable d'env : DRUGCAM_TRACA_ENV=prod
+# Le profil par défaut est "prod" depuis que le module Odoo eurekam_drugcam_traca
+# a été validé en production (2026-06-25). Pour cibler un autre environnement :
+#   - argument CLI : --env staging  /  --env dev
+#   - variable d'env : DRUGCAM_TRACA_ENV=staging
 #
-# Pour ajouter un profil (ex : pré-prod), ajouter une entrée à PROFILES.
+# Pour ajouter un profil, ajouter une entrée à PROFILES.
 PROFILES: dict[str, dict[str, str | int]] = {
     "prod": {
         "label": "Production (eurekam.odoo.com)",
@@ -61,7 +60,7 @@ PROFILES: dict[str, dict[str, str | int]] = {
 
 # Profil actif. Lu une seule fois au chargement du module (à override par
 # main.py via apply_env() si l'utilisateur passe --env).
-ACTIVE_PROFILE: str = os.environ.get("DRUGCAM_TRACA_ENV", "staging").lower()
+ACTIVE_PROFILE: str = os.environ.get("DRUGCAM_TRACA_ENV", "prod").lower()
 if ACTIVE_PROFILE not in PROFILES:
     # Fallback safe : staging si profil inconnu fourni
     ACTIVE_PROFILE = "staging"
