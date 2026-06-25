@@ -31,6 +31,16 @@ logger = logging.getLogger(__name__)
 #
 # Pour ajouter un profil (ex : pré-prod), ajouter une entrée à PROFILES.
 PROFILES: dict[str, dict[str, str | int]] = {
+    "prod": {
+        "label": "Production (eurekam.odoo.com)",
+        "host": "eurekam.odoo.com",
+        # Nom interne Odoo.sh de la base prod (différent du sous-domaine
+        # public qui est juste `eurekam`). Confirmé par Loïc le 2026-05-15.
+        "db": "tecliberp-eurekam-main-7835310",
+        "login": "loic.tamarelle@eurekam.fr",
+        "protocol": "jsonrpc+ssl",
+        "port": 443,
+    },
     "staging": {
         "label": "Sandbox (eurekam-sandbox-32757089)",
         "host": "eurekam-sandbox.odoo.com",
@@ -40,19 +50,9 @@ PROFILES: dict[str, dict[str, str | int]] = {
         "port": 443,
     },
     "dev": {
-        "label": "Staging Scalizer (eurekam-staging-33601704)",
-        "host": "eurekam-staging-33601704.dev.odoo.com",
+        "label": "Recette Scalizer (eurekam-staging-33601704)",
+        "host": "eurekam-recette.odoo.com",
         "db": "eurekam-staging-33601704",
-        "login": "loic.tamarelle@eurekam.fr",
-        "protocol": "jsonrpc+ssl",
-        "port": 443,
-    },
-    "prod": {
-        "label": "Production (eurekam.odoo.com)",
-        "host": "eurekam.odoo.com",
-        # Nom interne Odoo.sh de la base prod (différent du sous-domaine
-        # public qui est juste `eurekam`). Confirmé par Loïc le 2026-05-15.
-        "db": "tecliberp-eurekam-main-7835310",
         "login": "loic.tamarelle@eurekam.fr",
         "protocol": "jsonrpc+ssl",
         "port": 443,
